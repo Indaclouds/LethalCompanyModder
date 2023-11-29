@@ -43,7 +43,7 @@ $PredictPaths = @(
     "Program Files\Steam\steamapps\common"
     "SteamLibrary\steamapps\common"
     "Steam\SteamLibrary\steamapps\common"
-) | ForEach-Object -Process { $p = $_; $DriveRootPath | ForEach-Object -Process { Join-Path -Path $_ -ChildPath $p } }
+) | ForEach-Object -Process { foreach ($p in $DriveRootPaths) { Join-Path -Path $p -ChildPath $_ } }
 $ChildItemParams = @{
     Path   = $PredictPaths + $DriveRootPaths  # Respect order to check every path prediction first
     Filter = "Lethal Company"
