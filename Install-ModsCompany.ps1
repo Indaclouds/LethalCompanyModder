@@ -28,6 +28,10 @@
 [CmdletBinding()]
 param ()
 
+begin {
+    $ProgressPreference = "SilentlyContinue"
+}
+
 process {
     Write-Host "Starting the Lethal Company mod installation process."
 
