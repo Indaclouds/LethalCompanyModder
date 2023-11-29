@@ -32,7 +32,7 @@ process {
     Write-Host "Starting the Lethal Company mod installation process."
 
     # Check if system is running on Windows
-    if ($env:OS -match "Windows") { throw "Cannot run as it supports Windows only." }
+    if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 
     # Search for directory where Lethal Company is installed
     $ChildItemParams = @{
