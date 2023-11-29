@@ -1,5 +1,7 @@
 # LethalCompanyInstallMods
 
+Made with [VouDoo](https://github.com/VouDoo) :wrench:
+
 This powershell script allows you to install various useful mods for LethalCompany. It will first install BepInEx, a game patcher / plugin framework for Unity, followed by the addition mods hosted on [thunderstore.io](https://thunderstore.io/). 
 
 Mods currently installed are listed below:
