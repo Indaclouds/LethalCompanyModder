@@ -37,8 +37,15 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 
 # Search for directory where Lethal Company is installed
 Write-Host "Searching for Lethal Company installation directory..."
+$DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
+$PredictPaths = @(
+    "Program Files (x86)\Steam\steamapps\common" # Default Steam installation path for games
+    "Program Files\Steam\steamapps\common"
+    "SteamLibrary\steamapps\common"
+    "Steam\SteamLibrary\steamapps\common"
+) | ForEach-Object -Process { $p = $_; $DriveRootPath | ForEach-Object -Process { Join-Path -Path $_ -ChildPath $p } }
 $ChildItemParams = @{
-    Path   = Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty Root
+    Path   = $PredictPaths + $DriveRootPaths  # Respect order to check every path prediction first
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
