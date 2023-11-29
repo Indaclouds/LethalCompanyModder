@@ -36,6 +36,7 @@ Write-Host "Starting the Lethal Company mod installation process."
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 
 # Search for directory where Lethal Company is installed
+Write-Host "Searching for Lethal Company installation directory..."
 $ChildItemParams = @{
     Path   = Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty Root
     Filter = "Lethal Company"
