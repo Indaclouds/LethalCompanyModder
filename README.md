@@ -6,8 +6,11 @@ MyModsCompany is a powershell script that will allows you to install various use
 
 Mods currently installed are listed below:
 
-- MoreCompany
-- LateCompany
+- MoreCompany by [notnotnotswipez](https://github.com/VouDoo)
+- LateCompany by [anormaltwig](https://github.com/ANormalTwig/LC-LateCompany)
+- ShipLoot by [tinyhoot](https://github.com/tinyhoot/ShipLoot)
+- ShipClock by [ATK](https://thunderstore.io/c/lethal-company/p/ATK/ShipClock/)
+- Solos_Bodycams by [CapyCat](https://thunderstore.io/c/lethal-company/p/CapyCat/Solos_Bodycams/v/1.0.3/)
 
 ## How to install
 
