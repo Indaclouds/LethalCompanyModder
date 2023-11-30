@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run with PSDesktop",
+            "type": "shell",
+            "command": "Set-ExecutionPolicy ByPass -Scope Process; powershell.exe -File Install-ModsCompany.ps1 -Debug"
+        },
+        {
+            "label": "Run with PSCore",
+            "type": "shell",
+            "command": "Set-ExecutionPolicy ByPass -Scope Process; pwsh.exe -File Install-ModsCompany.ps1 -Debug"
+        },
+    ]
+}

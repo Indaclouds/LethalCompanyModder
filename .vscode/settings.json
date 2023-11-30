@@ -1,0 +1,13 @@
+{
+    "files.eol": "\r\n",
+    "files.encoding": "utf8",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "powershell.codeFormatting.preset": "Stroustrup",
+    "powershell.codeFormatting.addWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.autoCorrectAliases": true,
+}
