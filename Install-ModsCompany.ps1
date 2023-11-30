@@ -38,7 +38,7 @@ Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 
 # Search for directory where the Lethal Company is installed
-Write-Host "Searching for Lethal Company installation directory..."
+Write-Host "Search for Lethal Company installation directory."
 $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
 $PredictPaths = @(
     "Program Files (x86)\Steam\steamapps\common" # Default Steam installation path for games
@@ -52,30 +52,30 @@ $ChildItemParams = @{
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
 if ($GameDirectory) {
-    try {
-        $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop
-    }
+    try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop }
     catch { throw "Lethal Company executable not found." }
 }
 else { throw "Lethal Company installation directory not found." }
-Write-Host "Lethal Company installation has been found in directory `"$GameDirectory`"."
+Write-Debug -Message "Lethal Company installation has been found in directory `"$GameDirectory`"."
 
 # Define helper function to download and extract archives
 function Invoke-DownloadAndExtractArchive {
+    [CmdletBinding()]
     param (
         [string] $Url,
         [string] $Destination,
         [string[]] $Include,
         [string[]] $Exclude
     )
+
     process {
         $Temp = New-Item -Path $env:TEMP -Name (New-Guid) -ItemType Directory
         try {
-            Write-Host "Downloading from `"$Url`"."
+            Write-Debug -Message "Download package from `"$Url`"."
             Invoke-WebRequest -Uri $Url -OutFile "$Temp\archive.zip"
-            Write-Host "Extracting to `"$Destination`"."
+            Write-Debug -Message "Extract package to temporary directory."
             Expand-Archive -Path "$Temp\archive.zip" -DestinationPath "$Temp\expanded"
-            Write-Host "Copying files to `"$Destination`"."
+            Write-Debug -Message "Copy files to `"$Destination`"."
             Copy-Item -Path "$Temp\expanded\*" -Destination $Destination -Recurse -Include $Include -Exclude $Exclude -Force
         }
         finally { Remove-Item -Path $Temp -Recurse }
@@ -83,32 +83,40 @@ function Invoke-DownloadAndExtractArchive {
 }
 
 # Install BepInEx from GitHub
+Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
-if ($DownloadUrl) { Write-Host "Download BepInEx from `"$DownloadUrl`"." } else { throw "BepInEx download URL not found." }
+if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
 Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Exclude "changelog.txt"
 
 # Run Lethal Company executable to generate BepInEx configuration files
-Write-Host "Launch Lethal Company to generate BepInEx configuration files."
+Write-Host "Launch Lethal Company to install BepInEx."
+Write-Debug -Message "Start Lethal Company process and wait."
 Start-Process -FilePath $GameExecutable
 Start-Sleep -Seconds 10
+Write-Debug -Message "Stop Lethal Company process and wait."
 Stop-Process -Name "Lethal Company" -Force
 Start-Sleep -Seconds 5
 
 # Check if BepInEx configuration files have been successfully generated
+Write-Host "Check BepInEx installation."
 @(
-    "$GameDirectory\BepInEx\config\BepInEx.cfg"
-    "$GameDirectory\BepInEx\LogOutput.log"
+    "config\BepInEx.cfg"
+    "LogOutput.log"
 ) | ForEach-Object -Process {
-    if (-not (Test-Path -Path $_)) { throw "BepInEx configuration failed because `"$_`" not found." }
+    $Path = Join-Path -Path $GameDirectory -ChildPath "BepInEx\$_"
+    if (Test-Path -Path $Path) { Write-Debug -Message "BepInEx configuration file `"$_`" found." }
+    else { throw "BepInEx configuration failed because `"$_`" not found." }
 }
 
 # Install Mods from Thunderstore
 @( # List of mods
-    @{ ModName = "notnotnotswipez/MoreCompany"; Include = @("BepInEx") }
-    @{ ModName = "anormaltwig/LateCompany"; Include = @("BepInEx") }
+    @{ Name = "MoreCompany"; Namespace = "notnotnotswipez"; Include = @("BepInEx") }
+    @{ Name = "LateCompany"; Namespace = "anormaltwig"; Include = @("BepInEx") }
 ) | ForEach-Object -Process {
-    $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$($_.ModName)/")."latest"."download_url"
-    if ($DownloadUrl) { Write-Host "Download `"$($_.ModName)`" mod from `"$DownloadUrl`"." } else { throw "`"$($_.ModName)`" mod download URL was not found." }
+    Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
+    $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
+    $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
+    if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
     Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
 }
 
