@@ -86,6 +86,13 @@ function Invoke-DownloadAndExtractArchive {
     }
 }
 
+# Remove existing BepInEx configuration
+$BepInExFolder = Join-Path -Path $GameDirectory -ChildPath "BepInEx"
+if (Test-Path -Path $BepInExFolder -PathType Container) {
+    Write-Host "BepInEx folder already exist. Cleaning in progress."
+    Remove-Item -Path $BepInExFolder -Recurse -Force
+}
+
 # Install BepInEx from GitHub
 Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
@@ -116,6 +123,9 @@ Write-Host "Check BepInEx installation."
 @( # List of mods
     @{ Name = "MoreCompany"; Namespace = "notnotnotswipez"; Include = @("BepInEx") }
     @{ Name = "LateCompany"; Namespace = "anormaltwig"; Include = @("BepInEx") }
+    @{ Name = "ShipLoot"; Namespace = "tinyhoot"; Include = @("BepInEx") }
+    @{ Name = "ShipClock"; Namespace = "ATK"; Include = @("BepInEx") }
+    @{ Name = "Solos_Bodycams"; Namespace = "CapyCat"; Include = @("BepInEx") }
 ) | ForEach-Object -Process {
     Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
