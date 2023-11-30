@@ -2,26 +2,28 @@
 
 <#
 .SYNOPSIS
-    Install BepInEx and some mods for Lethal Company.
+    Install a selection of mods for Lethal Company.
 
 .DESCRIPTION
-    This script installs some plugins to increases the maximum player count for Lethal Company and add the capability to join game during a session.
+    This script installs the following mods for Lethal Company:
+        o MoreCompany: Increases the max player count.
+        o LateCompany: Enable players to join after the game has started.
 
 .EXAMPLE
     PS> ./Install-MoreCompany.ps1
 
-    Download, extract and install MoreCompany, LateCompany and all required componants.
+    Install mods for Lethal Company.
 
 .NOTES
-    This script assumes that your Lethal Company installation is managed by Steam on Windows.
-    Also, it installs BepInEx plugin framework, which is required to use the MoreCompany plugin.
+    This script assumes that your installation of Lethal Company is managed by Steam on Windows.
+    It also installs BepInEx plugin framework, as some mods are BepInEx plugins.
 
 .LINK
     - BepInEx GitHub repository: https://github.com/BepInEx/BepInEx
     - BepInEx installation guide: https://docs.bepinex.dev/articles/user_guide/installation/index.html
     - Thunderstore API documentation: https://thunderstore.io/api/docs/
-    - MoreCompany Thunderstore page: https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/
-    - LateCompany Thunderstore page: https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/
+    - MoreCompany mod Thunderstore page: https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/
+    - LateCompany mod Thunderstore page: https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/
 
 #>
 
@@ -30,12 +32,12 @@ param ()
 
 $ProgressPreference = "SilentlyContinue"
 
-Write-Host "Starting the Lethal Company mod installation process."
+Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
 # Check if system is running on Windows
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 
-# Search for directory where Lethal Company is installed
+# Search for directory where the Lethal Company is installed
 Write-Host "Searching for Lethal Company installation directory..."
 $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
 $PredictPaths = @(
@@ -51,15 +53,15 @@ $ChildItemParams = @{
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
 if ($GameDirectory) {
     try {
-        $LethalCompanyExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop
+        $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop
     }
     catch { throw "Lethal Company executable not found." }
 }
-else { throw "Lethal Company directory not found." }
+else { throw "Lethal Company installation directory not found." }
 Write-Host "Lethal Company installation has been found in directory `"$GameDirectory`"."
 
-# Define helper function to download and extract
-function Invoke-DownloadAndExtract {
+# Define helper function to download and extract archives
+function Invoke-DownloadAndExtractArchive {
     param (
         [string] $Url,
         [string] $Destination,
@@ -83,11 +85,11 @@ function Invoke-DownloadAndExtract {
 # Install BepInEx from GitHub
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
 if ($DownloadUrl) { Write-Host "Download BepInEx from `"$DownloadUrl`"." } else { throw "BepInEx download URL not found." }
-Invoke-DownloadAndExtract -Url $DownloadUrl -Destination $GameDirectory -Exclude "changelog.txt"
+Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Exclude "changelog.txt"
 
-# Start and stop the game process to generate BepInEx configuration files
+# Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to generate BepInEx configuration files."
-Start-Process -FilePath $LethalCompanyExecutable
+Start-Process -FilePath $GameExecutable
 Start-Sleep -Seconds 10
 Stop-Process -Name "Lethal Company" -Force
 Start-Sleep -Seconds 5
@@ -109,12 +111,11 @@ Start-Sleep -Seconds 5
     if ($ModInfo."latest"."download_url") {
         $DownloadUrl = $ModInfo."latest"."download_url"
         Write-Host "Download `"$($_.ModName)`" from `"$DownloadUrl`"."
-        Invoke-DownloadAndExtract -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
+        Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
     }
     else {
         throw "Cannot download `"$($_.ModName)`" because source URL was not found."
     }
 }
 
-Write-Host "Lethal Company mod installation completed."
-
+Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
