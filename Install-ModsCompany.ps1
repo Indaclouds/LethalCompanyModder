@@ -5,9 +5,7 @@
     Install a selection of mods for Lethal Company.
 
 .DESCRIPTION
-    This script installs the following mods for Lethal Company:
-        o MoreCompany: Increases the max player count.
-        o LateCompany: Enable players to join after the game has started.
+    This script installs the list of selected mods for Lethal Company.
 
 .EXAMPLE
     PS> ./Install-MoreCompany.ps1
@@ -22,8 +20,7 @@
     - BepInEx GitHub repository: https://github.com/BepInEx/BepInEx
     - BepInEx installation guide: https://docs.bepinex.dev/articles/user_guide/installation/index.html
     - Thunderstore API documentation: https://thunderstore.io/api/docs/
-    - MoreCompany mod Thunderstore page: https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/
-    - LateCompany mod Thunderstore page: https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/
+    - Lethal Company community page on Thunderstore: https://thunderstore.io/c/lethal-company/
 
 #>
 
