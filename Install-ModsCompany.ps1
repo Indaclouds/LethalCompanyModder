@@ -37,16 +37,12 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 
 #region Lethal Company mods
-<# TODO Fix not working installation for some mods.
-    These plugins use a different path to the plugin DLL file.
-    Invoke-DownloadAndExtractArchive needs a rework.
-#>
 $Mods = @(
-    @{ From = "Thunderstore"; Name = "MoreCompany"; Namespace = "notnotnotswipez"; Include = @("BepInEx") }
-    @{ From = "Thunderstore"; Name = "LateCompany"; Namespace = "anormaltwig"; Include = @("BepInEx") }
-    @{ From = "Thunderstore"; Name = "ShipLoot"; Namespace = "tinyhoot"; Include = @("BepInEx") }  # Not working
-    @{ From = "Thunderstore"; Name = "ShipClock"; Namespace = "ATK"; Include = @("BepInEx") }  # Not working
-    @{ From = "Thunderstore"; Name = "Solos_Bodycams"; Namespace = "CapyCat"; Include = @("BepInEx") }  # Not working
+    @{ From = "Thunderstore"; Name = "MoreCompany"; Namespace = "notnotnotswipez"; Type = "BepInExPlugin" }
+    @{ From = "Thunderstore"; Name = "LateCompany"; Namespace = "anormaltwig"; Type = "BepInExPlugin" }
+    @{ From = "Thunderstore"; Name = "ShipLoot"; Namespace = "tinyhoot"; Type = "BepInExPlugin" }
+    @{ From = "Thunderstore"; Name = "ShipClock"; Namespace = "ATK"; Type = "BepInExPlugin" }
+    @{ From = "Thunderstore"; Name = "Solos_Bodycams"; Namespace = "CapyCat"; Type = "BepInExPlugin" }
 )
 #endregion
 
@@ -79,6 +75,7 @@ function Invoke-DownloadAndExtractArchive {
     param (
         [string] $Url,
         [string] $Destination,
+        [switch] $FlatCopy,
         [string[]] $Include,
         [string[]] $Exclude
     )
@@ -91,7 +88,13 @@ function Invoke-DownloadAndExtractArchive {
             Write-Debug -Message "Extract package to temporary directory."
             Expand-Archive -Path "$Temp\archive.zip" -DestinationPath "$Temp\expanded"
             Write-Debug -Message "Copy files to `"$Destination`"."
-            Copy-Item -Path "$Temp\expanded\*" -Destination $Destination -Recurse -Include $Include -Exclude $Exclude -Force
+            $Filter = @{ Include = $Include; Exclude = $Exclude }
+            if ($FlatCopy.IsPresent) {
+                Get-ChildItem -Path "$Temp\expanded\*" @Filter -Recurse | Copy-Item -Destination $Destination -Force
+            }
+            else {
+                Copy-Item -Path "$Temp\expanded\*" -Destination $Destination @Filter -Recurse -Force
+            }
         }
         finally { Remove-Item -Path $Temp -Recurse }
     }
@@ -124,7 +127,7 @@ Start-Process -FilePath $GameExecutable
 Start-Sleep -Seconds 10
 Write-Debug -Message "Stop Lethal Company process and wait."
 Stop-Process -Name "Lethal Company" -Force
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 2
 
 # Check if BepInEx configuration files have been successfully generated
 Write-Host "Check BepInEx installation."
@@ -137,13 +140,21 @@ Write-Host "Check BepInEx installation."
     else { throw "BepInEx configuration failed because `"$_`" not found." }
 }
 
+# Define BepInEx plugins directory
+$BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
+
 # Install Mods from Thunderstore
 $Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -Process {
     Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
-    Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
+    switch ($_.Type) {
+        "BepInExPlugin" {
+            Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $BepInExPluginsDirectory -FlatCopy -Include "*.dll"
+        }
+        Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
+    }
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
