@@ -107,15 +107,9 @@ Start-Sleep -Seconds 5
     @{ ModName = "notnotnotswipez/MoreCompany"; Include = @("BepInEx") }
     @{ ModName = "anormaltwig/LateCompany"; Include = @("BepInEx") }
 ) | ForEach-Object -Process {
-    $ModInfo = Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$($_.ModName)/"
-    if ($ModInfo."latest"."download_url") {
-        $DownloadUrl = $ModInfo."latest"."download_url"
-        Write-Host "Download `"$($_.ModName)`" from `"$DownloadUrl`"."
-        Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
-    }
-    else {
-        throw "Cannot download `"$($_.ModName)`" because source URL was not found."
-    }
+    $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$($_.ModName)/")."latest"."download_url"
+    if ($DownloadUrl) { Write-Host "Download `"$($_.ModName)`" mod from `"$DownloadUrl`"." } else { throw "`"$($_.ModName)`" mod download URL was not found." }
+    Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Include $_.Include
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
