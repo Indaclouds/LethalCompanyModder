@@ -31,6 +31,10 @@
 param ()
 
 $ProgressPreference = "SilentlyContinue"
+if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
+    # Fix repetitive action confirmation in PowerShell Desktop when Debug parameter is set
+    $DebugPreference = "Continue"
+}
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
