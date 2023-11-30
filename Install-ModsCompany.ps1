@@ -33,10 +33,24 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
     $DebugPreference = "Continue"
 }
 
-Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
-
 # Check if system is running on Windows
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
+
+#region Lethal Company mods
+<# TODO Fix not working installation for some mods.
+    These plugins use a different path to the plugin DLL file.
+    Invoke-DownloadAndExtractArchive needs a rework.
+#>
+$Mods = @(
+    @{ From = "Thunderstore"; Name = "MoreCompany"; Namespace = "notnotnotswipez"; Include = @("BepInEx") }
+    @{ From = "Thunderstore"; Name = "LateCompany"; Namespace = "anormaltwig"; Include = @("BepInEx") }
+    @{ From = "Thunderstore"; Name = "ShipLoot"; Namespace = "tinyhoot"; Include = @("BepInEx") }  # Not working
+    @{ From = "Thunderstore"; Name = "ShipClock"; Namespace = "ATK"; Include = @("BepInEx") }  # Not working
+    @{ From = "Thunderstore"; Name = "Solos_Bodycams"; Namespace = "CapyCat"; Include = @("BepInEx") }  # Not working
+)
+#endregion
+
+Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
 # Search for directory where the Lethal Company is installed
 Write-Host "Search for Lethal Company installation directory."
@@ -117,13 +131,7 @@ Write-Host "Check BepInEx installation."
 }
 
 # Install Mods from Thunderstore
-@( # List of mods
-    @{ Name = "MoreCompany"; Namespace = "notnotnotswipez"; Include = @("BepInEx") }
-    @{ Name = "LateCompany"; Namespace = "anormaltwig"; Include = @("BepInEx") }
-    @{ Name = "ShipLoot"; Namespace = "tinyhoot"; Include = @("BepInEx") }
-    @{ Name = "ShipClock"; Namespace = "ATK"; Include = @("BepInEx") }
-    @{ Name = "Solos_Bodycams"; Namespace = "CapyCat"; Include = @("BepInEx") }
-) | ForEach-Object -Process {
+$Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -Process {
     Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
