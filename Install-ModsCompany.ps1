@@ -97,11 +97,18 @@ function Invoke-DownloadAndExtractArchive {
     }
 }
 
-# Remove existing BepInEx configuration
-$BepInExFolder = Join-Path -Path $GameDirectory -ChildPath "BepInEx"
-if (Test-Path -Path $BepInExFolder -PathType Container) {
-    Write-Host "BepInEx folder already exist. Cleaning in progress."
-    Remove-Item -Path $BepInExFolder -Recurse -Force
+# Remove existing BepInEx components from Lethal Company directory
+Write-Host "Clean BepInEx files and directory up."
+@(
+    "BepInEx"
+    "winhttp.dll"
+    "doorstop_config.ini"
+) | ForEach-Object -Process {
+    $Path = Join-Path -Path $GameDirectory -ChildPath $_
+    if (Test-Path -Path $Path) {
+        Write-Debug -Message "Remove existing BepInEx component `"$_`"."
+        Remove-Item -Path $Path -Recurse -Force
+    }
 }
 
 # Install BepInEx from GitHub
