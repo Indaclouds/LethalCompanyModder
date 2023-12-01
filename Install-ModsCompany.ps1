@@ -41,15 +41,64 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 
 #region ---- Definition of Lethal Company mods
 $Mods = @(
-    @{ From = "Thunderstore"; Name = "MoreCompany"; Namespace = "notnotnotswipez"; Type = "BepInExPlugin" }
-    @{ From = "Thunderstore"; Name = "LateCompany"; Namespace = "anormaltwig"; Type = "BepInExPlugin" }
-    @{ From = "Thunderstore"; Name = "ShipLoot"; Namespace = "tinyhoot"; Type = "BepInExPlugin" }
-    @{ From = "Thunderstore"; Name = "ShipClock"; Namespace = "ATK"; Type = "BepInExPlugin" }
-    @{ From = "Thunderstore"; Name = "Solos_Bodycams"; Namespace = "CapyCat"; Type = "BepInExPlugin" }
+    @{
+        Name = "MoreCompany"
+        Description = "Increase the max player count"
+        From = "Thunderstore"; Namespace = "notnotnotswipez"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "LateCompany"
+        Description = "players can join after the game has started"
+        From = "Thunderstore"; Namespace = "anormaltwig"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "ShipLoot"
+        Description = "Display the total scrap value on the ship"
+        From = "Thunderstore"; Namespace = "tinyhoot"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "ShipClock"
+        Description = "Display the clock in the ship"
+        From = "Thunderstore"; Namespace = "ATK"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "Solos_Bodycams"
+        Description = "Replaces the ships internal camera (right monitor) with bodycams that are linked to the radar"
+        From = "Thunderstore"; Namespace = "CapyCat"; Type = "BepInExPlugin"
+    }
 )
 #endregion ----
 
 #region ---- Installation of Lethal Company mods
+$Banner = @"
+  ##################################################################################
+  ##                                                                              ##
+ ###    ###        #######   #########   ###    ###        ###       ###          ##
+ ###    ###        ###         ####      ###    ###       #####       ###         ##
+ ###   ###        ####         ####      ##########      #######      ###         ###
+ ###   ###        ########     ####      ##########     #### ####     ###         ###
+ ###  ###         ###          ####      ###    ###    ###########    ###         ###
+ ### ##########   ########     ####      ###    ###   #####   #####    #########  ###
+ ##                                                                                ##
+###    #####    ######   #####    ##### #######     #####   ####    #######   #### ###
+### ######### ########## ######  ###### #########  ######   #####   ########  #### ###
+## #####     ####    ### ######  ###### ###  ####  #######  ####### #### #######   ###
+## ####      ###     ### ############## ######### #### #### ############  ######   ###
+## #####     ####    ### ### ########## #######  ########## #### #######   ####     ##
+##  #################### ### ##### #### ###     ################  ######   ###      ##
+##    ######    #####%   ###  ###   ### ###     ####    ########    ####   ###      ##
+##                                                                                  ##
+######################################################################################
+
+Our auto-pilot is going to install a selected list of high-end mods for you (and the Company).
+In the meantime, just seat back and relax...
+
+Mods to be installed:
+{0}
+
+"@ -f ($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.Name, $_.Description } | Join-String -Separator "`r`n")
+Write-Host $Banner -ForegroundColor Green
+
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
 # Search for directory where the Lethal Company is installed
