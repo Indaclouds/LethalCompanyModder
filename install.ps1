@@ -8,7 +8,7 @@
     This script installs the list of selected mods for Lethal Company.
 
 .EXAMPLE
-    PS> ./Install-MoreCompany.ps1
+    PS> ./install.ps1
 
     Install mods for Lethal Company.
 
