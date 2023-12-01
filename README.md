@@ -1,8 +1,8 @@
-# MyModsCompany
+# ModdedCompany
 
 Made with [VouDoo](https://github.com/VouDoo) :wrench:
 
-MyModsCompany is a PowerShell script that installs various mods for LethalCompany. It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
+ModdedCompany is a PowerShell script that installs various mods for LethalCompany. It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
 
 List of mods installed by the script:
 
