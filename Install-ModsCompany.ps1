@@ -71,6 +71,7 @@ $Mods = @(
 
 #region ---- Installation of Lethal Company mods
 $Banner = @"
+
   ##################################################################################
   ##                                                                              ##
  ###    ###        #######   #########   ###    ###        ###       ###          ##
@@ -212,5 +213,5 @@ $Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
 
-Write-Host "Get back to work with your crewmates! No more excuses for not meeting the Company's profit quotas..." -ForegroundColor Green
+Write-Host "`r`nGet back to work with your crewmates! No more excuses for not meeting the Company's profit quotas...`r`n" -ForegroundColor Green
 #endregion ----
