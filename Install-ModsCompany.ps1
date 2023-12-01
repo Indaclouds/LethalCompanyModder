@@ -96,7 +96,7 @@ In the meantime, just seat back and relax...
 Mods to be installed:
 {0}
 
-"@ -f ($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.Name, $_.Description } | Join-String -Separator "`r`n")
+"@ -f (($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.Name, $_.Description }) -join "`r`n")
 Write-Host $Banner -ForegroundColor Green
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
