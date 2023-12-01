@@ -57,14 +57,24 @@ $Mods = @(
         From = "Thunderstore"; Namespace = "tinyhoot"; Type = "BepInExPlugin"
     }
     @{
-        Name = "ShipClock"
-        Description = "Display the clock in the ship"
-        From = "Thunderstore"; Namespace = "ATK"; Type = "BepInExPlugin"
+        Name = "Solos_Bodycams"
+        Description = "Replace the ships internal camera (right monitor) with bodycams that are linked to the radar"
+        From = "Thunderstore"; Namespace = "CapyCat"; Type = "BepInExPlugin"
     }
     @{
-        Name = "Solos_Bodycams"
-        Description = "Replaces the ships internal camera (right monitor) with bodycams that are linked to the radar"
-        From = "Thunderstore"; Namespace = "CapyCat"; Type = "BepInExPlugin"
+        Name = "TerminalApi"
+        Description = "Provides a nice a easy way to add and modify terminal keywords"
+        From = "Thunderstore"; Namespace = "NotAtomicBomb"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "Terminal_Clock"  # Depends on TerminalApi mod
+        Description = "Add a clock to the top right of the terminal"
+        From = "Thunderstore"; Namespace = "NotAtomicBomb"; Type = "BepInExPlugin"
+    }
+    @{
+        Name = "LBtoKG"
+        Description = "View items weight in kilograms"
+        From = "Thunderstore"; Namespace = "Zduniusz"; Type = "BepInExPlugin"
     }
 )
 #endregion ----
