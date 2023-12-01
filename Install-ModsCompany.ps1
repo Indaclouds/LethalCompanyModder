@@ -27,6 +27,8 @@
 [CmdletBinding()]
 param ()
 
+#region ---- System and PowerShell configuration and pre-flight check
+# Set PowerShell Cmdlet
 $ProgressPreference = "SilentlyContinue"
 if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
     # Fix repetitive action confirmation in PowerShell Desktop when Debug parameter is set
@@ -35,8 +37,9 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 
 # Check if system is running on Windows
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
+#endregion ----
 
-#region Lethal Company mods
+#region ---- Definition of Lethal Company mods
 $Mods = @(
     @{ From = "Thunderstore"; Name = "MoreCompany"; Namespace = "notnotnotswipez"; Type = "BepInExPlugin" }
     @{ From = "Thunderstore"; Name = "LateCompany"; Namespace = "anormaltwig"; Type = "BepInExPlugin" }
@@ -44,15 +47,16 @@ $Mods = @(
     @{ From = "Thunderstore"; Name = "ShipClock"; Namespace = "ATK"; Type = "BepInExPlugin" }
     @{ From = "Thunderstore"; Name = "Solos_Bodycams"; Namespace = "CapyCat"; Type = "BepInExPlugin" }
 )
-#endregion
+#endregion ----
 
+#region ---- Installation of Lethal Company mods
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
 # Search for directory where the Lethal Company is installed
 Write-Host "Search for Lethal Company installation directory."
 $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
 $PredictPaths = @(
-    "Program Files (x86)\Steam\steamapps\common" # Default Steam installation path for games
+    "Program Files (x86)\Steam\steamapps\common"  # Default Steam installation path for games
     "Program Files\Steam\steamapps\common"
     "SteamLibrary\steamapps\common"
     "Steam\SteamLibrary\steamapps\common"
@@ -158,3 +162,4 @@ $Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
+#endregion ----
