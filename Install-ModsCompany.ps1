@@ -211,4 +211,6 @@ $Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
+
+Write-Host "Get back to work with your crewmates! No more excuses for not meeting the Company's profit quotas..." -ForegroundColor Green
 #endregion ----
