@@ -2,9 +2,9 @@
 
 Made with [VouDoo](https://github.com/VouDoo) :wrench:
 
-MyModsCompany is a powershell script that will allows you to install various useful mods for LethalCompany. It will first install BepInEx, a game patcher / plugin framework for Unity, followed by the addition of some mods hosted by [thunderstore.io](https://thunderstore.io/).
+MyModsCompany is a PowerShell script that installs various mods for LethalCompany. It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
 
-Mods currently installed are listed below:
+List of mods installed by the script:
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
@@ -22,6 +22,6 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 ## (Optional) Check your files
 
-If you would like to check your installation files, you can find them in your game directory. The mods are located in the 'Plugins' folder of BepInEx.
+If you would like to check your installation files, you can find them in your game directory. The mods are located under the `BepInEx\plugins` directory.
 
 ![Check](https://github.com/Indaclouds/LethalCompanyInstallMods/assets/66850779/207efa58-edda-4922-bb98-15d1679b2a9d)
