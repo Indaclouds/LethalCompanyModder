@@ -177,7 +177,7 @@ Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
 Write-Debug -Message "Start Lethal Company process and wait."
-Start-Process -FilePath $GameExecutable
+Start-Process -FilePath $GameExecutable -WindowStyle Hidden
 Start-Sleep -Seconds 10
 Write-Debug -Message "Stop Lethal Company process and wait."
 Stop-Process -Name "Lethal Company" -Force
