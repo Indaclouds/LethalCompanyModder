@@ -50,7 +50,7 @@ param (
 #region ---- System and PowerShell configuration and pre-flight check
 # Set PowerShell Cmdlet
 $ErrorActionPreference = "Stop"
-$ProgressPreference = "SilentlyContinue"
+$ProgressPreference = "SilentlyContinue"  # Fix slow execution for some cmdlets
 if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
     # Fix repetitive action confirmation in PowerShell Desktop when Debug parameter is set
     $DebugPreference = "Continue"
