@@ -1,10 +1,18 @@
 # LethalCompanyModder
 
-Made with [VouDoo](https://github.com/VouDoo) :wrench:
-
 This PowerShell script installs a list of selected mods for LethalCompany.
 
 It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
+
+---
+
+## How to install
+
+Open a PowerShell console and execute this one-liner command:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; $Script = "$env:TEMP\LethalCompanyModder.ps1"; iwr "https://raw.githubusercontent.com/Indaclouds/LethalCompanyInstallMods/main/install.ps1" -OutFile $Script; & $Script
+```
 
 ## Curated list of mods
 
@@ -20,15 +28,7 @@ _This is the list of mods to be installed when no curated or custom list is spec
 - [Terminal_Clock](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 
-## How to install
-
-Open a PowerShell console and execute this one-liner:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; $Script = "$env:TEMP\LethalCompanyModder.ps1"; iwr "https://raw.githubusercontent.com/Indaclouds/LethalCompanyInstallMods/main/install.ps1" -OutFile $Script; & $Script
-```
-
-## (Optional) Check your files
+## Check your files
 
 If you would like to check your installation files, you can find them in your game directory. The mods are located under the `BepInEx\plugins` directory.
 
