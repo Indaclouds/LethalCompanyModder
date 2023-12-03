@@ -2,9 +2,15 @@
 
 Made with [VouDoo](https://github.com/VouDoo) :wrench:
 
-This PowerShell script installs various mods for LethalCompany. It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
+This PowerShell script installs a list of selected mods for LethalCompany.
 
-List of mods installed by the script:
+It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
+
+## Curated list of mods
+
+### `default` mods
+
+_This is the list of mods to be installed when no curated or custom list is specified by the user._
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
