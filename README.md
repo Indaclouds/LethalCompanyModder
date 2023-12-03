@@ -25,7 +25,7 @@ _This is the list of mods to be installed when no curated or custom list is spec
 Open a PowerShell console and execute this one-liner:
 
 ```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/Indaclouds/LethalCompanyInstallMods/main/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; $Script = "$env:TEMP\LethalCompanyModder.ps1"; iwr "https://raw.githubusercontent.com/Indaclouds/LethalCompanyInstallMods/main/install.ps1" -OutFile $Script; & $Script
 ```
 
 ## (Optional) Check your files

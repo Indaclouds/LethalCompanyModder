@@ -43,7 +43,7 @@ param (
         ParameterSetName = "Custom",
         HelpMessage = "Path to a JSON file including a list of mods to install"
     )]
-    #ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
     [string] $File
 )
 
