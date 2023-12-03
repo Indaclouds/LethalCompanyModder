@@ -24,8 +24,28 @@
 
 #>
 
-[CmdletBinding()]
-param ()
+[CmdletBinding(DefaultParameterSetName = "Curated")]
+param (
+    [Parameter(
+        ParameterSetName = "Curated",
+        HelpMessage = "Name of a curated list of mods to install"
+    )]
+    [ValidateSet("default")]
+    [string] $List = "default",
+
+    [Parameter(
+        ParameterSetName = "Curated",
+        HelpMessage = "Name of the Git branch where the curated list of mods is located"
+    )]
+    [string] $GitBranch = "main",
+
+    [Parameter(
+        ParameterSetName = "Custom",
+        HelpMessage = "Path to a JSON file including a list of mods to install"
+    )]
+    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [string] $File
+)
 
 #region ---- System and PowerShell configuration and pre-flight check
 # Set PowerShell Cmdlet
@@ -39,47 +59,16 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 #endregion ----
 
-#region ---- Definition of Lethal Company mods
-$Mods = @(
-    @{
-        Name = "MoreCompany"
-        Description = "Increase the max player count"
-        From = "Thunderstore"; Namespace = "notnotnotswipez"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "LateCompany"
-        Description = "Players can join after the game has started"
-        From = "Thunderstore"; Namespace = "anormaltwig"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "ShipLoot"
-        Description = "Display the total scrap value on the ship"
-        From = "Thunderstore"; Namespace = "tinyhoot"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "Solos_Bodycams"
-        Description = "Replace the ships internal camera (right monitor) with bodycams that are linked to the radar"
-        From = "Thunderstore"; Namespace = "CapyCat"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "TerminalApi"
-        Description = "Provides a nice a easy way to add and modify terminal keywords"
-        From = "Thunderstore"; Namespace = "NotAtomicBomb"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "Terminal_Clock"  # Depends on TerminalApi mod
-        Description = "Add a clock to the top right of the terminal"
-        From = "Thunderstore"; Namespace = "NotAtomicBomb"; Type = "BepInExPlugin"
-    }
-    @{
-        Name = "LBtoKG"
-        Description = "View items weight in kilograms"
-        From = "Thunderstore"; Namespace = "Zduniusz"; Type = "BepInExPlugin"
-    }
-)
+#region ---- Definition of mods for Lethal Company
+$Mods = $(switch ($PSCmdlet.ParameterSetName) {
+        "Curated" {
+            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods/$List.json" | Select-Object -ExpandProperty Content
+        }
+        "Custom" { Get-Content -Path $ModsFile -Raw }
+    }) | ConvertFrom-Json
 #endregion ----
 
-#region ---- Installation of Lethal Company mods
+#region ---- Installation of mods for Lethal Company
 $Banner = @"
 
   ##################################################################################
@@ -112,7 +101,7 @@ Write-Host $Banner -ForegroundColor Green
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
-# Search for directory where the Lethal Company is installed
+# Search for directory where Lethal Company is installed
 Write-Host "Search for Lethal Company installation directory."
 $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
 $PredictPaths = @(
