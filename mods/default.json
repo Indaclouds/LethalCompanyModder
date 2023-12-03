@@ -1,0 +1,51 @@
+[
+  {
+    "Name": "MoreCompany",
+    "Type": "BepInExPlugin",
+    "Namespace": "notnotnotswipez",
+    "Description": "Increase the max player count",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "LateCompany",
+    "Type": "BepInExPlugin",
+    "Namespace": "anormaltwig",
+    "Description": "Players can join after the game has started",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "ShipLoot",
+    "Type": "BepInExPlugin",
+    "Namespace": "tinyhoot",
+    "Description": "Display the total scrap value on the ship",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "Solos_Bodycams",
+    "Type": "BepInExPlugin",
+    "Namespace": "CapyCat",
+    "Description": "Replace the ships internal camera (right monitor) with bodycams that are linked to the radar",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "TerminalApi",
+    "Type": "BepInExPlugin",
+    "Namespace": "NotAtomicBomb",
+    "Description": "Provides a nice a easy way to add and modify terminal keywords",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "Terminal_Clock",
+    "Type": "BepInExPlugin",
+    "Namespace": "NotAtomicBomb",
+    "Description": "Add a clock to the top right of the terminal",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "LBtoKG",
+    "Type": "BepInExPlugin",
+    "Namespace": "Zduniusz",
+    "Description": "View items weight in kilograms",
+    "From": "Thunderstore"
+  }
+]
