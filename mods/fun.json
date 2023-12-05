@@ -54,5 +54,12 @@
     "Namespace": "Suskitech",
     "Description": "Allows you to hear active walkies even when you're not holding them",
     "From": "Thunderstore"
+  },
+  {
+    "Name": "Solos_Bodycams",
+    "Type": "BepInExPlugin",
+    "Namespace": "CapyCat",
+    "Description": "Replace the ships internal camera (right monitor) with bodycams that are linked to the radar",
+    "From": "Thunderstore"
   }
 ]

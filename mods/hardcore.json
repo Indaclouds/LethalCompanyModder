@@ -21,31 +21,31 @@
     "From": "Thunderstore"
   },
   {
-    "Name": "HealthMetrics",
-    "Type": "BepInExPlugin",
-    "Namespace": "matsuura",
-    "Description": "Add a simple health counter on your HUD",
-    "From": "Thunderstore"
-  },
-  {
-    "Name": "TerminalApi",
-    "Type": "BepInExPlugin",
-    "Namespace": "NotAtomicBomb",
-    "Description": "Provides a nice a easy way to add and modify terminal keywords",
-    "From": "Thunderstore"
-  },
-  {
-    "Name": "Terminal_Clock",
-    "Type": "BepInExPlugin",
-    "Namespace": "NotAtomicBomb",
-    "Description": "Add a clock to the top right of the terminal",
-    "From": "Thunderstore"
-  },
-  {
     "Name": "LBtoKG",
     "Type": "BepInExPlugin",
     "Namespace": "Zduniusz",
     "Description": "View items weight in kilograms",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "LC_API",
+    "Type": "BepInExPlugin",
+    "Namespace": "2018",
+    "Description": "Lethal Company modding AP",
+    "From": "Lethal Company modding API"
+  },
+  {
+    "Name": "Brutal_Company",
+    "Type": "BepInExPlugin",
+    "Namespace": "2018",
+    "Description": "A hardcore mod for lethal company",
+    "From": "Thunderstore"
+  },
+  {
+    "Name": "SuperLandmine",
+    "Type": "BepInExPlugin",
+    "Namespace": "phawitpp",
+    "Description": "Add more power to landmine",
     "From": "Thunderstore"
   },
   {
