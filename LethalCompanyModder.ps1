@@ -30,7 +30,7 @@ param (
         ParameterSetName = "Curated",
         HelpMessage = "Name of a curated list of mods to install"
     )]
-    [ValidateSet("default")]
+    [ValidateSet("default", "hardcore", "fun")]
     [string] $List = "default",
 
     [Parameter(
