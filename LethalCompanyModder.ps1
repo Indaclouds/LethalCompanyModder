@@ -89,7 +89,7 @@ function Invoke-PackageDownloader {
             Write-Debug -Message "Download package archive from `"$Url`"."
             Invoke-WebRequest -Uri $Url -OutFile "$TemporaryDirectory\package.zip"
             Write-Debug -Message "Extract package archive to temporary directory `"$TemporaryDirectory`"."
-            Expand-Archive -Path "$TemporaryDirectory\package.zip" -DestinationPath $TemporaryDirectory -ErrorAction Stop
+            Expand-Archive -Path "$TemporaryDirectory\package.zip" -DestinationPath $TemporaryDirectory
             Remove-Item -Path "$TemporaryDirectory\package.zip"
         }
         catch {
@@ -224,7 +224,11 @@ Write-Host "Clean BepInEx files and directory up."
 Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
 if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
-Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Exclude "changelog.txt"
+try {
+    $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
+    Copy-Item -Path "$TempPackage\*" -Destination $GameDirectory -Exclude "changelog.txt" -Recurse -Force
+}
+finally { Remove-Item -Path $TempPackage -Recurse }
 
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
@@ -255,12 +259,16 @@ $Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore" | ForEach-Ob
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
-    switch ($_.Type) {
-        "BepInExPlugin" {
-            Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $BepInExPluginsDirectory -FlatCopy -Include "*.dll"
+    try {
+        $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
+        switch ($_.Type) {
+            "BepInExPlugin" {
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInExPluginsDirectory
+            }
+            Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
-        Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
     }
+    finally { Remove-Item -Path $TempPackage -Recurse }
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
