@@ -33,11 +33,9 @@ param (
     [switch] $ServerHost,
 
     [Parameter(
-        ParameterSetName = "Curated",
-        HelpMessage = "Name of a curated list of mods to install"
+        HelpMessage = "Name of the list of mods to install"
     )]
-    [ValidateSet("default", "hardcore", "fun")]
-    [string] $List = "default",
+    [string] $List = "Default",
 
     [Parameter(
         ParameterSetName = "Curated",
@@ -67,12 +65,16 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 #endregion ----
 
 #region ---- Definition of mods for Lethal Company
-$Mods = $(switch ($PSCmdlet.ParameterSetName) {
+$ModsData = $(switch ($PSCmdlet.ParameterSetName) {
         "Curated" {
-            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods/$List.json" | Select-Object -ExpandProperty Content
+            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods.json" | Select-Object -ExpandProperty Content
         }
-        "Custom" { Get-Content -Path $File -Raw }
+        "Custom" {
+            Get-Content -Path $File -Raw
+        }
     }) | ConvertFrom-Json
+$ModsSelection = $ModsData.Lists | Select-Object -ExpandProperty $List
+$Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $ModsSelection
 
 # If ServerHost parameter is not present, exclude mods that are only required by server host
 if (-not $ServerHost.IsPresent) {
@@ -108,7 +110,7 @@ In the meantime, just seat back and relax...
 Mods to be installed:
 {0}
 
-"@ -f (($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.Name, $_.Description }) -join "`r`n")
+"@ -f (($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.DisplayName, $_.Description }) -join "`r`n")
 Write-Host $Banner -ForegroundColor Green
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
@@ -209,8 +211,8 @@ Write-Host "Check BepInEx installation."
 $BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
 
 # Install Mods from Thunderstore
-$Mods | Where-Object -Property "From" -EQ -Value "Thunderstore" | ForEach-Object -Process {
-    Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
+$Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore" | ForEach-Object -Process {
+    Write-Host ("Install {0} mod by {1}." -f $_.DisplayName, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
