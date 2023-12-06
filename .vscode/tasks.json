@@ -4,12 +4,12 @@
         {
             "label": "Run with PSDesktop",
             "type": "shell",
-            "command": "Set-ExecutionPolicy ByPass -Scope Process; powershell.exe -File install.ps1 -Debug"
+            "command": "Set-ExecutionPolicy ByPass -Scope Process; powershell.exe -File LethalCompanyModder.ps1 -Debug"
         },
         {
             "label": "Run with PSCore",
             "type": "shell",
-            "command": "Set-ExecutionPolicy ByPass -Scope Process; pwsh.exe -File install.ps1 -Debug"
+            "command": "Set-ExecutionPolicy ByPass -Scope Process; pwsh.exe -File LethalCompanyModder.ps1 -Debug"
         },
     ]
 }
