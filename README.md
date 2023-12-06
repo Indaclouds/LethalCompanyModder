@@ -14,6 +14,7 @@ You don't need to install anything on your Windows system to run this script.
     - [Custom installation](#custom-installation)
       - [Install curated list of mods](#install-curated-list-of-mods)
       - [Install list of mods from file](#install-list-of-mods-from-file)
+      - [Install for game host](#install-for-game-host)
     - [Upgrade](#upgrade)
   - [Curated list of mods](#curated-list-of-mods)
     - [`default` mods](#default-mods)
@@ -50,14 +51,26 @@ If needed, you can pass some parameters to the script:
 
 #### Install curated list of mods
 
+Install mods from a list maintained by us on GitHub:
+
 ```powershell
 & .\LethalCompanyModder.ps1 -List "yet-another-list-of-mods"
 ```
 
 #### Install list of mods from file
 
+Install mods from a list defined in a file on your system:
+
 ```powershell
 & .\LethalCompanyModder.ps1 -File "./path/to/yet-another-list-of-mods.json"
+```
+
+#### Install for game host
+
+Install mods, including those required only by the game host:
+
+```powershell
+& .\LethalCompanyModder.ps1 -ServerHost
 ```
 
 ### Upgrade

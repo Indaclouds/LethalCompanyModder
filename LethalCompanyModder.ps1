@@ -27,6 +27,12 @@
 [CmdletBinding(DefaultParameterSetName = "Curated")]
 param (
     [Parameter(
+        HelpMessage = "Specify this parameter if you intend to host the game (server)"
+    )]
+    [Alias("Server")]
+    [switch] $ServerHost,
+
+    [Parameter(
         ParameterSetName = "Curated",
         HelpMessage = "Name of a curated list of mods to install"
     )]
@@ -65,8 +71,13 @@ $Mods = $(switch ($PSCmdlet.ParameterSetName) {
         "Curated" {
             Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods/$List.json" | Select-Object -ExpandProperty Content
         }
-        "Custom" { Get-Content -Path $ModsFile -Raw }
+        "Custom" { Get-Content -Path $File -Raw }
     }) | ConvertFrom-Json
+
+# If ServerHost parameter is not present, exclude mods that are only required by server host
+if (-not $ServerHost.IsPresent) {
+    $Mods = $Mods | Where-Object -Property "ServerHostOnly" -NE -Value $true
+}
 #endregion ----
 
 #region ---- Installation of mods for Lethal Company
@@ -104,7 +115,7 @@ Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 
 # Search for directory where Lethal Company is installed
 Write-Host "Search for Lethal Company installation directory."
-$DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property Name -NE -Value "Temp" | Select-Object -ExpandProperty Root
+$DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property "Name" -NE -Value "Temp" | Select-Object -ExpandProperty Root
 $PredictPaths = @(
     "Program Files (x86)\Steam\steamapps\common"  # Default Steam installation path for games
     "Program Files\Steam\steamapps\common"
@@ -198,7 +209,7 @@ Write-Host "Check BepInEx installation."
 $BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
 
 # Install Mods from Thunderstore
-$Mods | Where-Object -Property From -EQ -Value "Thunderstore" | ForEach-Object -Process {
+$Mods | Where-Object -Property "From" -EQ -Value "Thunderstore" | ForEach-Object -Process {
     Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
