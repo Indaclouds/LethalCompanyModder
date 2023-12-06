@@ -65,6 +65,10 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 #endregion ----
 
 #region ---- Define helper functions
+function New-TemporaryDirectory {
+    $RandomString = -join ((97..122) | Get-Random -Count 8 | ForEach-Object -Process { [char]$_ })
+    New-Item -Path $env:TEMP -Name "LethalCompanyModder-$RandomString" -ItemType Directory | Select-Object -ExpandProperty FullName
+}
 function Invoke-DownloadAndExtractArchive {
     [CmdletBinding()]
     param (
@@ -76,7 +80,7 @@ function Invoke-DownloadAndExtractArchive {
     )
 
     process {
-        $Temp = New-Item -Path $env:TEMP -Name (New-Guid) -ItemType Directory
+        $Temp = New-TemporaryDirectory
         try {
             Write-Debug -Message "Download package from `"$Url`"."
             Invoke-WebRequest -Uri $Url -OutFile "$Temp\archive.zip"
