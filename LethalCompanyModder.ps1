@@ -99,36 +99,6 @@ function Invoke-PackageDownloader {
         $TemporaryDirectory
     }
 }
-
-function Invoke-DownloadAndExtractArchive {
-    [CmdletBinding()]
-    param (
-        [string] $Url,
-        [string] $Destination,
-        [switch] $FlatCopy,
-        [string[]] $Include,
-        [string[]] $Exclude
-    )
-
-    process {
-        $Temp = New-TemporaryDirectory
-        try {
-            Write-Debug -Message "Download package from `"$Url`"."
-            Invoke-WebRequest -Uri $Url -OutFile "$Temp\archive.zip"
-            Write-Debug -Message "Extract package to temporary directory."
-            Expand-Archive -Path "$Temp\archive.zip" -DestinationPath "$Temp\expanded"
-            Write-Debug -Message "Copy files to `"$Destination`"."
-            $Filter = @{ Include = $Include; Exclude = $Exclude }
-            if ($FlatCopy.IsPresent) {
-                Get-ChildItem -Path "$Temp\expanded\*" @Filter -Recurse | Copy-Item -Destination $Destination -Force
-            }
-            else {
-                Copy-Item -Path "$Temp\expanded\*" -Destination $Destination @Filter -Recurse -Force
-            }
-        }
-        finally { Remove-Item -Path $Temp -Recurse }
-    }
-}
 #endregion ----
 
 #region ---- Definition of mods for Lethal Company
