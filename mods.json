@@ -41,6 +41,7 @@
       "Provider": "Thunderstore",
       "Namespace": "notnotnotswipez",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -50,6 +51,7 @@
       "Provider": "Thunderstore",
       "Namespace": "anormaltwig",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -59,6 +61,7 @@
       "Provider": "Thunderstore",
       "Namespace": "tinyhoot",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -68,6 +71,7 @@
       "Provider": "Thunderstore",
       "Namespace": "matsuura",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -77,6 +81,7 @@
       "Provider": "Thunderstore",
       "Namespace": "NotAtomicBomb",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -86,6 +91,7 @@
       "Provider": "Thunderstore",
       "Namespace": "NotAtomicBomb",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -95,6 +101,7 @@
       "Provider": "Thunderstore",
       "Namespace": "Zduniusz",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -104,6 +111,7 @@
       "Provider": "Thunderstore",
       "Namespace": "Suskitech",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -113,6 +121,7 @@
       "Provider": "Thunderstore",
       "Namespace": "CapyCat",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -122,6 +131,7 @@
       "Provider": "Thunderstore",
       "Namespace": "2018",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": true
     },
     {
@@ -131,6 +141,7 @@
       "Provider": "Thunderstore",
       "Namespace": "2018",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": true
     },
     {
@@ -140,6 +151,7 @@
       "Provider": "Thunderstore",
       "Namespace": "phawitpp",
       "Type": "BepInExPlugin",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     },
     {
@@ -149,7 +161,7 @@
       "Provider": "Thunderstore",
       "Namespace": "x753",
       "Type": "BepInExPlugin",
-      "ExtraFiles": "BepInEx\\plugins\\moresuits",
+      "ExtraIncludes": ["BepInEx\\plugins\\moresuits"],
       "ServerHostOnly": false
     }
   ]

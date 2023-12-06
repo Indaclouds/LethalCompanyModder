@@ -196,6 +196,7 @@ $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/Bep
 if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
 try {
     $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
+    Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
     Copy-Item -Path "$TempPackage\*" -Destination $GameDirectory -Exclude "changelog.txt" -Recurse -Force
 }
 finally { Remove-Item -Path $TempPackage -Recurse }
@@ -224,16 +225,23 @@ Write-Host "Check BepInEx installation."
 $BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
 
 # Install Mods from Thunderstore
-$Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore" | ForEach-Object -Process {
-    Write-Host ("Install {0} mod by {1}." -f $_.DisplayName, $_.Namespace)
-    $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
+$ThunderstoreMods = $Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore"
+foreach ($mod in $ThunderstoreMods) {
+    Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
+    $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
     try {
         $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
-        switch ($_.Type) {
+        switch ($mod.Type) {
             "BepInExPlugin" {
+                Write-Debug -Message "Copy DLL files from `"$FullName`" to `"$BepInExPluginsDirectory`"."
                 Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInExPluginsDirectory
+                foreach ($item in $mod.ExtraIncludes) {
+                    $Path = Join-Path -Path $TempPackage -ChildPath $item
+                    Write-Debug -Message "Copy `"$item`" from `"$FullName`" to `"$BepInExPluginsDirectory`"."
+                    Copy-Item -Path $Path -Destination $BepInExPluginsDirectory -Recurse
+                }
             }
             Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
