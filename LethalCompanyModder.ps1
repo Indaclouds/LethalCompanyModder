@@ -199,7 +199,7 @@ try {
     Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
     Copy-Item -Path "$TempPackage\*" -Destination $GameDirectory -Exclude "changelog.txt" -Recurse -Force
 }
-finally { Remove-Item -Path $TempPackage -Recurse -ErrorAction SilentlyContinue }
+finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
@@ -246,7 +246,7 @@ foreach ($mod in $ThunderstoreMods) {
             Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
     }
-    finally { Remove-Item -Path $TempPackage -Recurse -ErrorAction SilentlyContinue }
+    finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
