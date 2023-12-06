@@ -5,7 +5,7 @@
     Install a selection of mods for Lethal Company.
 
 .DESCRIPTION
-    This script installs the list of selected mods for Lethal Company.
+    This script installs a selection of mods for Lethal Company defined in a preset.
 
 .EXAMPLE
     PS> ./LethalCompanyModder.ps1
@@ -33,19 +33,19 @@ param (
     [switch] $ServerHost,
 
     [Parameter(
-        HelpMessage = "Name of the list of mods to install"
+        HelpMessage = "Name of the preset of mods to install"
     )]
-    [string] $List = "Default",
+    [string] $Preset = "Default",
 
     [Parameter(
         ParameterSetName = "Curated",
-        HelpMessage = "Name of the Git branch where the curated list of mods is located"
+        HelpMessage = "Name of the Git branch where the curated preset of mods is located"
     )]
     [string] $GitBranch = "main",
 
     [Parameter(
         ParameterSetName = "Custom",
-        HelpMessage = "Path to a JSON file including a list of mods to install"
+        HelpMessage = "Path to a JSON file including the preset of mods to install"
     )]
     [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
     [string] $File
@@ -73,7 +73,7 @@ $ModsData = $(switch ($PSCmdlet.ParameterSetName) {
             Get-Content -Path $File -Raw
         }
     }) | ConvertFrom-Json
-$ModsSelection = $ModsData.Lists | Select-Object -ExpandProperty $List
+$ModsSelection = $ModsData.Presets | Select-Object -ExpandProperty $Preset
 $Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $ModsSelection
 
 # If ServerHost parameter is not present, exclude mods that are only required by server host
@@ -104,7 +104,7 @@ $Banner = @"
 ##                                                                                  ##
 ######################################################################################
 
-Our auto-pilot is going to install a selected list of high-end mods for you (and the Company).
+Our auto-pilot is going to install a selection of high-end mods for you (and the Company).
 In the meantime, just seat back and relax...
 
 Mods to be installed:
