@@ -30,7 +30,8 @@
       "LBtoKG",
       "AlwaysHearActiveWalkies",
       "Solos_Bodycams",
-      "More_Suits"
+      "More_Suits",
+      "HookGenPatcher"
     ]
   },
   "Mods": [
@@ -162,6 +163,16 @@
       "Namespace": "x753",
       "Type": "BepInExPlugin",
       "ExtraIncludes": ["BepInEx\\plugins\\moresuits"],
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "HookGenPatcher",
+      "DisplayName": "HookGenPatcher",
+      "Description": "Generate MMHOOK file during the BepInEx preloader phase.",
+      "Provider": "Thunderstore",
+      "Namespace": "Evaisa",
+      "Type": "BepInExPatcher",
+      "ExtraIncludes": [],
       "ServerHostOnly": false
     }
   ]

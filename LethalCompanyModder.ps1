@@ -249,6 +249,9 @@ foreach ($mod in $ThunderstoreMods) {
                     Copy-Item -Path $Path -Destination $BepInExPluginsDirectory -Recurse
                 }
             }
+            "BepInExPatcher" {
+                Write-Warning -Message "Cannot install `"$FullName`" as BepInExPatcher support is not implemented yet."
+            }
             Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
     }
