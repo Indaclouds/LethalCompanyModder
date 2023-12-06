@@ -1,0 +1,145 @@
+{
+  "Lists": {
+    "Default": [
+      "MoreCompany",
+      "LateCompany",
+      "ShipLoot",
+      "HealthMetrics",
+      "TerminalApi",
+      "Terminal_Clock",
+      "LBtoKG",
+      "AlwaysHearActiveWalkies"
+    ],
+    "Hardcore": [
+      "MoreCompany",
+      "LateCompany",
+      "ShipLoot",
+      "LC_API",
+      "Brutal_Company",
+      "SuperLandmine",
+      "LBtoKG",
+      "AlwaysHearActiveWalkies"
+    ],
+    "Experimental": [
+      "MoreCompany",
+      "LateCompany",
+      "ShipLoot",
+      "HealthMetrics",
+      "TerminalApi",
+      "Terminal_Clock",
+      "LBtoKG",
+      "AlwaysHearActiveWalkies",
+      "Solos_Bodycams"
+    ]
+  },
+  "Mods": [
+    {
+      "Name": "MoreCompany",
+      "DisplayName": "MoreCompany",
+      "Description": "Increase the max player count",
+      "Provider": "Thunderstore",
+      "Namespace": "notnotnotswipez",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "LateCompany",
+      "DisplayName": "LateCompany",
+      "Description": "Players can join after the game has started",
+      "Provider": "Thunderstore",
+      "Namespace": "anormaltwig",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "ShipLoot",
+      "DisplayName": "ShipLoot",
+      "Description": "Display the total scrap value on the ship",
+      "Provider": "Thunderstore",
+      "Namespace": "tinyhoot",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "HealthMetrics",
+      "DisplayName": "HealthMetrics",
+      "Description": "Add a simple health counter on your HUD",
+      "Provider": "Thunderstore",
+      "Namespace": "matsuura",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "TerminalApi",
+      "DisplayName": "TerminalApi",
+      "Description": "Provides a nice a easy way to add and modify terminal keywords",
+      "Provider": "Thunderstore",
+      "Namespace": "NotAtomicBomb",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "Terminal_Clock",
+      "DisplayName": "Terminal Clock",
+      "Description": "Add a clock to the top right of the terminal",
+      "Provider": "Thunderstore",
+      "Namespace": "NotAtomicBomb",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "LBtoKG",
+      "DisplayName": "LBtoKG",
+      "Description": "View items weight in kilograms",
+      "Provider": "Thunderstore",
+      "Namespace": "Zduniusz",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "AlwaysHearActiveWalkies",
+      "DisplayName": "AlwaysHearActiveWalkies",
+      "Description": "Allows you to hear active walkies even when you're not holding them",
+      "Provider": "Thunderstore",
+      "Namespace": "Suskitech",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "Solos_Bodycams",
+      "DisplayName": "Solos Bodycams",
+      "Description": "Replace the ships internal camera (right monitor) with bodycams that are linked to the radar",
+      "Provider": "Thunderstore",
+      "Namespace": "CapyCat",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "LC_API",
+      "DisplayName": "LC API",
+      "Description": "Lethal Company modding API",
+      "Provider": "Thunderstore",
+      "Namespace": "2018",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": true
+    },
+    {
+      "Name": "Brutal_Company",
+      "DisplayName": "Brutal Company",
+      "Description": "A hardcore mod for lethal company",
+      "Provider": "Thunderstore",
+      "Namespace": "2018",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": true
+    },
+    {
+      "Name": "SuperLandmine",
+      "DisplayName": "SuperLandmine",
+      "Description": "Add more power to landmine",
+      "Provider": "Thunderstore",
+      "Namespace": "phawitpp",
+      "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    }
+  ]
+}

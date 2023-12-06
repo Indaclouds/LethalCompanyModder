@@ -17,9 +17,9 @@ You don't need to install anything on your Windows system to run this script.
       - [Install for game host](#install-for-game-host)
     - [Upgrade](#upgrade)
   - [Curated list of mods](#curated-list-of-mods)
-    - [`default` mods](#default-mods)
-    - [`hardcore` mods](#hardcore-mods)
-    - [`fun` mods](#fun-mods)
+    - [`Default` mods](#default-mods)
+    - [`Hardcore` mods](#hardcore-mods)
+    - [`Experimental` mods](#experimental-mods)
   - [Check your files](#check-your-files)
 
 ---
@@ -81,7 +81,7 @@ Mods and dependencies will be re-installed with the latest version.
 
 ## Curated list of mods
 
-### `default` mods
+### `Default` mods
 
 _This is the list of mods to be installed when no curated or custom list is specified by the user._
 
@@ -94,7 +94,7 @@ _This is the list of mods to be installed when no curated or custom list is spec
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `hardcore` mods
+### `Hardcore` mods
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
@@ -105,7 +105,7 @@ _This is the list of mods to be installed when no curated or custom list is spec
 - [SuperLandmine](https://thunderstore.io/c/lethal-company/p/phawitpp/SuperLandmine/) by phawitpp
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `fun` mods
+### `Experimental` mods
 
 _This is the list of mods to be installed when no curated or custom list is specified by the user._
 
