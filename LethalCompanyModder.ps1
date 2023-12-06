@@ -73,8 +73,11 @@ $ModsData = $(switch ($PSCmdlet.ParameterSetName) {
             Get-Content -Path $File -Raw
         }
     }) | ConvertFrom-Json
-$ModsSelection = $ModsData.Presets | Select-Object -ExpandProperty $Preset
-$Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $ModsSelection
+$SelectedMods = $ModsData.Presets | Select-Object -ExpandProperty $Preset
+if (-not $SelectedMods) {
+    throw "No mod to install. Preset `"$Preset`" is empty or does not exist."
+}
+$Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $SelectedMods
 
 # If ServerHost parameter is not present, exclude mods that are only required by server host
 if (-not $ServerHost.IsPresent) {
