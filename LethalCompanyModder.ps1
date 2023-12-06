@@ -66,8 +66,13 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 
 #region ---- Define helper functions
 function New-TemporaryDirectory {
-    $RandomString = -join ((97..122) | Get-Random -Count 8 | ForEach-Object -Process { [char]$_ })
-    New-Item -Path $env:TEMP -Name "LethalCompanyModder-$RandomString" -ItemType Directory | Select-Object -ExpandProperty FullName
+    [CmdletBinding()]
+    param ()
+
+    process {
+        $RandomString = -join ((97..122) | Get-Random -Count 8 | ForEach-Object -Process { [char]$_ })
+        New-Item -Path $env:TEMP -Name "LethalCompanyModder-$RandomString" -ItemType Directory | Select-Object -ExpandProperty FullName
+    }
 }
 function Invoke-DownloadAndExtractArchive {
     [CmdletBinding()]
