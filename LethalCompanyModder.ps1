@@ -27,6 +27,12 @@
 [CmdletBinding(DefaultParameterSetName = "Curated")]
 param (
     [Parameter(
+        HelpMessage = "Specify this parameter if you intend to host the game (server)"
+    )]
+    [Alias("Server")]
+    [switch] $ServerHost,
+
+    [Parameter(
         ParameterSetName = "Curated",
         HelpMessage = "Name of a curated list of mods to install"
     )]
@@ -67,6 +73,11 @@ $Mods = $(switch ($PSCmdlet.ParameterSetName) {
         }
         "Custom" { Get-Content -Path $File -Raw }
     }) | ConvertFrom-Json
+
+# If ServerHost parameter is not present, exclude mods that are only required by server host
+if (-not $ServerHost.IsPresent) {
+    $Mods = $Mods | Where-Object -Property "ServerHostOnly" -NE -Value $true
+}
 #endregion ----
 
 #region ---- Installation of mods for Lethal Company
