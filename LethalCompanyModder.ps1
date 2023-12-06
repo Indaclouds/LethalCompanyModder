@@ -66,6 +66,7 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 
 #region ---- Define helper functions
 function New-TemporaryDirectory {
+    # Create a new temporary directory and return its path
     [CmdletBinding()]
     param ()
 
@@ -74,6 +75,31 @@ function New-TemporaryDirectory {
         New-Item -Path $env:TEMP -Name "LethalCompanyModder-$RandomString" -ItemType Directory | Select-Object -ExpandProperty FullName
     }
 }
+
+function Invoke-PackageDownloader {
+    # Download and extract a package in a temporary directory and return its path
+    [CmdletBinding()]
+    param (
+        [string] $Url
+    )
+
+    process {
+        $TemporaryDirectory = New-TemporaryDirectory
+        try {
+            Write-Debug -Message "Download package archive from `"$Url`"."
+            Invoke-WebRequest -Uri $Url -OutFile "$TemporaryDirectory\package.zip"
+            Write-Debug -Message "Extract package archive to temporary directory `"$TemporaryDirectory`"."
+            Expand-Archive -Path "$TemporaryDirectory\package.zip" -DestinationPath $TemporaryDirectory -ErrorAction Stop
+            Remove-Item -Path "$TemporaryDirectory\package.zip"
+        }
+        catch {
+            Remove-Item -Path $TemporaryDirectory -Recurse
+            throw "An error occured with package downloader: {0}" -f $_.Exception.Message
+        }
+        $TemporaryDirectory
+    }
+}
+
 function Invoke-DownloadAndExtractArchive {
     [CmdletBinding()]
     param (
