@@ -1,6 +1,6 @@
 # LethalCompanyModder
 
-This PowerShell script installs a list of selected mods for LethalCompany.
+This PowerShell script installs a selection of mods for LethalCompany.
 
 It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
 
@@ -12,14 +12,14 @@ You don't need to install anything on your Windows system to run this script.
   - [How to use](#how-to-use)
     - [Basic installation](#basic-installation)
     - [Custom installation](#custom-installation)
-      - [Install curated list of mods](#install-curated-list-of-mods)
-      - [Install list of mods from file](#install-list-of-mods-from-file)
+      - [Install curated preset of mods](#install-curated-preset-of-mods)
+      - [Install preset of mods from file](#install-preset-of-mods-from-file)
       - [Install for game host](#install-for-game-host)
     - [Upgrade](#upgrade)
-  - [Curated list of mods](#curated-list-of-mods)
-    - [`default` mods](#default-mods)
-    - [`hardcore` mods](#hardcore-mods)
-    - [`fun` mods](#fun-mods)
+  - [Curated preset of mods](#curated-preset-of-mods)
+    - [`Default` mods](#default-mods)
+    - [`Hardcore` mods](#hardcore-mods)
+    - [`Experimental` mods](#experimental-mods)
   - [Check your files](#check-your-files)
 
 ---
@@ -49,20 +49,20 @@ If needed, you can pass some parameters to the script:
 & .\LethalCompanyModder.ps1 <parameters>
 ```
 
-#### Install curated list of mods
+#### Install curated preset of mods
 
-Install mods from a list maintained by us on GitHub:
+Install mods from a preser maintained by us on GitHub:
 
 ```powershell
-& .\LethalCompanyModder.ps1 -List "yet-another-list-of-mods"
+& .\LethalCompanyModder.ps1 -Preset "Hardcore"
 ```
 
-#### Install list of mods from file
+#### Install preset of mods from file
 
-Install mods from a list defined in a file on your system:
+Install mods from a preset defined in a file on your system:
 
 ```powershell
-& .\LethalCompanyModder.ps1 -File "./path/to/yet-another-list-of-mods.json"
+& .\LethalCompanyModder.ps1 -File "./path/to/mods.json"
 ```
 
 #### Install for game host
@@ -79,22 +79,22 @@ If you need to update, re-run the script once again.
 
 Mods and dependencies will be re-installed with the latest version.
 
-## Curated list of mods
+## Curated preset of mods
 
-### `default` mods
+### `Default` mods
 
-_This is the list of mods to be installed when no curated or custom list is specified by the user._
+_This is the preset of mods to be installed when no curated or custom preset is specified by the user._
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
 - [ShipLoot](https://thunderstore.io/c/lethal-company/p/tinyhoot/ShipLoot/) by [tinyhoot](https://github.com/tinyhoot)
 - [HealthMetrics](https://thunderstore.io/c/lethal-company/p/matsuura/HealthMetrics/) by matsuura
 - [TerminalApi](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/TerminalApi/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
-- [Terminal_Clock](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
+- [Terminal Clock](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `hardcore` mods
+### `Hardcore` mods
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
@@ -105,19 +105,17 @@ _This is the list of mods to be installed when no curated or custom list is spec
 - [SuperLandmine](https://thunderstore.io/c/lethal-company/p/phawitpp/SuperLandmine/) by phawitpp
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `fun` mods
-
-_This is the list of mods to be installed when no curated or custom list is specified by the user._
+### `Experimental` mods
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
 - [ShipLoot](https://thunderstore.io/c/lethal-company/p/tinyhoot/ShipLoot/) by [tinyhoot](https://github.com/tinyhoot)
 - [HealthMetrics](https://thunderstore.io/c/lethal-company/p/matsuura/HealthMetrics/) by matsuura
 - [TerminalApi](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/TerminalApi/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
-- [Terminal_Clock](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
+- [Terminal Clock](https://thunderstore.io/c/lethal-company/p/NotAtomicBomb/Terminal_Clock/) by [NotAtomicBomb](https://github.com/NotAtomicBomb)
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
-- [Solos_Bodycams](https://thunderstore.io/c/lethal-company/p/CapyCat/Solos_Bodycams/) by CapyCat
+- [Solos Bodycams](https://thunderstore.io/c/lethal-company/p/CapyCat/Solos_Bodycams/) by CapyCat
 
 ## Check your files
 

@@ -5,7 +5,7 @@
     Install a selection of mods for Lethal Company.
 
 .DESCRIPTION
-    This script installs the list of selected mods for Lethal Company.
+    This script installs a selection of mods for Lethal Company defined in a preset.
 
 .EXAMPLE
     PS> ./LethalCompanyModder.ps1
@@ -33,21 +33,19 @@ param (
     [switch] $ServerHost,
 
     [Parameter(
-        ParameterSetName = "Curated",
-        HelpMessage = "Name of a curated list of mods to install"
+        HelpMessage = "Name of the preset of mods to install"
     )]
-    [ValidateSet("default", "hardcore", "fun")]
-    [string] $List = "default",
+    [string] $Preset = "Default",
 
     [Parameter(
         ParameterSetName = "Curated",
-        HelpMessage = "Name of the Git branch where the curated list of mods is located"
+        HelpMessage = "Name of the Git branch where the curated preset of mods is located"
     )]
     [string] $GitBranch = "main",
 
     [Parameter(
         ParameterSetName = "Custom",
-        HelpMessage = "Path to a JSON file including a list of mods to install"
+        HelpMessage = "Path to a JSON file including the preset of mods to install"
     )]
     [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
     [string] $File
@@ -67,12 +65,19 @@ if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only
 #endregion ----
 
 #region ---- Definition of mods for Lethal Company
-$Mods = $(switch ($PSCmdlet.ParameterSetName) {
+$ModsData = $(switch ($PSCmdlet.ParameterSetName) {
         "Curated" {
-            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods/$List.json" | Select-Object -ExpandProperty Content
+            Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods.json" | Select-Object -ExpandProperty Content
         }
-        "Custom" { Get-Content -Path $File -Raw }
+        "Custom" {
+            Get-Content -Path $File -Raw
+        }
     }) | ConvertFrom-Json
+$SelectedMods = $ModsData.Presets | Select-Object -ExpandProperty $Preset
+if (-not $SelectedMods) {
+    throw "No mod to install. Preset `"$Preset`" is empty or does not exist."
+}
+$Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $SelectedMods
 
 # If ServerHost parameter is not present, exclude mods that are only required by server host
 if (-not $ServerHost.IsPresent) {
@@ -102,13 +107,13 @@ $Banner = @"
 ##                                                                                  ##
 ######################################################################################
 
-Our auto-pilot is going to install a selected list of high-end mods for you (and the Company).
+Our auto-pilot is going to install a selection of high-end mods for you (and the Company).
 In the meantime, just seat back and relax...
 
 Mods to be installed:
 {0}
 
-"@ -f (($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.Name, $_.Description }) -join "`r`n")
+"@ -f (($Mods | ForEach-Object -Process { " o {0}: {1}" -f $_.DisplayName, $_.Description }) -join "`r`n")
 Write-Host $Banner -ForegroundColor Green
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
@@ -209,8 +214,8 @@ Write-Host "Check BepInEx installation."
 $BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
 
 # Install Mods from Thunderstore
-$Mods | Where-Object -Property "From" -EQ -Value "Thunderstore" | ForEach-Object -Process {
-    Write-Host ("Install {0} mod by {1}." -f $_.Name, $_.Namespace)
+$Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore" | ForEach-Object -Process {
+    Write-Host ("Install {0} mod by {1}." -f $_.DisplayName, $_.Namespace)
     $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
