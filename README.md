@@ -15,7 +15,7 @@ You don't need to install anything on your Windows system to run this script.
       - [Install a curated preset of mods](#install-a-curated-preset-of-mods)
       - [Install a preset of mods from file](#install-a-preset-of-mods-from-file)
       - [Install for game host](#install-for-game-host)
-    - [Upgrade](#upgrade)
+    - [Update](#update)
   - [Curated presets of mods](#curated-presets-of-mods)
     - [`Default` preset](#default-preset)
     - [`Hardcore` preset](#hardcore-preset)
@@ -73,11 +73,13 @@ Install mods, including those required only by the game host:
 & .\LethalCompanyModder.ps1 -ServerHost
 ```
 
-### Upgrade
+### Update
 
 If you need to update, re-run the script once again.
 
 Mods and dependencies will be re-installed with the latest version.
+
+`BepInEx` directory is backup-ed in the game directory as `BepInEx_Backup.zip`.
 
 ## Curated presets of mods
 
