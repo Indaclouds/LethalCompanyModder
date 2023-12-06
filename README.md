@@ -12,14 +12,14 @@ You don't need to install anything on your Windows system to run this script.
   - [How to use](#how-to-use)
     - [Basic installation](#basic-installation)
     - [Custom installation](#custom-installation)
-      - [Install curated preset of mods](#install-curated-preset-of-mods)
-      - [Install preset of mods from file](#install-preset-of-mods-from-file)
+      - [Install a curated preset of mods](#install-a-curated-preset-of-mods)
+      - [Install a preset of mods from file](#install-a-preset-of-mods-from-file)
       - [Install for game host](#install-for-game-host)
     - [Upgrade](#upgrade)
-  - [Curated preset of mods](#curated-preset-of-mods)
-    - [`Default` mods](#default-mods)
-    - [`Hardcore` mods](#hardcore-mods)
-    - [`Experimental` mods](#experimental-mods)
+  - [Curated presets of mods](#curated-presets-of-mods)
+    - [`Default` preset](#default-preset)
+    - [`Hardcore` preset](#hardcore-preset)
+    - [`Experimental` preset](#experimental-preset)
   - [Check your files](#check-your-files)
 
 ---
@@ -49,7 +49,7 @@ If needed, you can pass some parameters to the script:
 & .\LethalCompanyModder.ps1 <parameters>
 ```
 
-#### Install curated preset of mods
+#### Install a curated preset of mods
 
 Install mods from a preser maintained by us on GitHub:
 
@@ -57,12 +57,12 @@ Install mods from a preser maintained by us on GitHub:
 & .\LethalCompanyModder.ps1 -Preset "Hardcore"
 ```
 
-#### Install preset of mods from file
+#### Install a preset of mods from file
 
 Install mods from a preset defined in a file on your system:
 
 ```powershell
-& .\LethalCompanyModder.ps1 -File "./path/to/mods.json"
+& .\LethalCompanyModder.ps1 -Preset "MyPreset" -File "./path/to/mods.json"
 ```
 
 #### Install for game host
@@ -79,11 +79,11 @@ If you need to update, re-run the script once again.
 
 Mods and dependencies will be re-installed with the latest version.
 
-## Curated preset of mods
+## Curated presets of mods
 
-### `Default` mods
+### `Default` preset
 
-_This is the preset of mods to be installed when no curated or custom preset is specified by the user._
+_This is the selection of mods to be installed when no curated or custom preset is specified by the user._
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
@@ -94,7 +94,7 @@ _This is the preset of mods to be installed when no curated or custom preset is 
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `Hardcore` mods
+### `Hardcore` preset
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
@@ -105,7 +105,7 @@ _This is the preset of mods to be installed when no curated or custom preset is 
 - [SuperLandmine](https://thunderstore.io/c/lethal-company/p/phawitpp/SuperLandmine/) by phawitpp
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 
-### `Experimental` mods
+### `Experimental` preset
 
 - [MoreCompany](https://thunderstore.io/c/lethal-company/p/notnotnotswipez/MoreCompany/) by [notnotnotswipez](https://github.com/notnotnotswipez)
 - [LateCompany](https://thunderstore.io/c/lethal-company/p/anormaltwig/LateCompany/) by [anormaltwig](https://github.com/ANormalTwig)
