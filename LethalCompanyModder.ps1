@@ -64,6 +64,43 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
 #endregion ----
 
+#region ---- Define helper functions
+function New-TemporaryDirectory {
+    # Create a new temporary directory and return its path
+    [CmdletBinding()]
+    param ()
+
+    process {
+        $RandomString = -join ((97..122) | Get-Random -Count 8 | ForEach-Object -Process { [char]$_ })
+        New-Item -Path $env:TEMP -Name "LethalCompanyModder-$RandomString" -ItemType Directory | Select-Object -ExpandProperty FullName
+    }
+}
+
+function Invoke-PackageDownloader {
+    # Download and extract a package in a temporary directory and return its path
+    [CmdletBinding()]
+    param (
+        [string] $Url
+    )
+
+    process {
+        $TemporaryDirectory = New-TemporaryDirectory
+        try {
+            Write-Debug -Message "Download package archive from `"$Url`"."
+            Invoke-WebRequest -Uri $Url -OutFile "$TemporaryDirectory\package.zip"
+            Write-Debug -Message "Extract package archive to temporary directory `"$TemporaryDirectory`"."
+            Expand-Archive -Path "$TemporaryDirectory\package.zip" -DestinationPath $TemporaryDirectory
+            Remove-Item -Path "$TemporaryDirectory\package.zip"
+        }
+        catch {
+            Remove-Item -Path $TemporaryDirectory -Recurse
+            throw "An error occured with package downloader: {0}" -f $_.Exception.Message
+        }
+        $TemporaryDirectory
+    }
+}
+#endregion ----
+
 #region ---- Definition of mods for Lethal Company
 $ModsData = $(switch ($PSCmdlet.ParameterSetName) {
         "Curated" {
@@ -139,37 +176,6 @@ if ($GameDirectory) {
 else { throw "Lethal Company installation directory not found." }
 Write-Debug -Message "Lethal Company installation has been found in directory `"$GameDirectory`"."
 
-# Define helper function to download and extract archives
-function Invoke-DownloadAndExtractArchive {
-    [CmdletBinding()]
-    param (
-        [string] $Url,
-        [string] $Destination,
-        [switch] $FlatCopy,
-        [string[]] $Include,
-        [string[]] $Exclude
-    )
-
-    process {
-        $Temp = New-Item -Path $env:TEMP -Name (New-Guid) -ItemType Directory
-        try {
-            Write-Debug -Message "Download package from `"$Url`"."
-            Invoke-WebRequest -Uri $Url -OutFile "$Temp\archive.zip"
-            Write-Debug -Message "Extract package to temporary directory."
-            Expand-Archive -Path "$Temp\archive.zip" -DestinationPath "$Temp\expanded"
-            Write-Debug -Message "Copy files to `"$Destination`"."
-            $Filter = @{ Include = $Include; Exclude = $Exclude }
-            if ($FlatCopy.IsPresent) {
-                Get-ChildItem -Path "$Temp\expanded\*" @Filter -Recurse | Copy-Item -Destination $Destination -Force
-            }
-            else {
-                Copy-Item -Path "$Temp\expanded\*" -Destination $Destination @Filter -Recurse -Force
-            }
-        }
-        finally { Remove-Item -Path $Temp -Recurse }
-    }
-}
-
 # Remove existing BepInEx components from Lethal Company directory
 Write-Host "Clean BepInEx files and directory up."
 @(
@@ -188,7 +194,12 @@ Write-Host "Clean BepInEx files and directory up."
 Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
 if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
-Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $GameDirectory -Exclude "changelog.txt"
+try {
+    $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
+    Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
+    Copy-Item -Path "$TempPackage\*" -Destination $GameDirectory -Exclude "changelog.txt" -Recurse -Force
+}
+finally { Remove-Item -Path $TempPackage -Recurse }
 
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
@@ -214,17 +225,28 @@ Write-Host "Check BepInEx installation."
 $BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
 
 # Install Mods from Thunderstore
-$Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore" | ForEach-Object -Process {
-    Write-Host ("Install {0} mod by {1}." -f $_.DisplayName, $_.Namespace)
-    $FullName = "{0}/{1}" -f $_.Namespace, $_.Name
+$ThunderstoreMods = $Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore"
+foreach ($mod in $ThunderstoreMods) {
+    Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
+    $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
     if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
-    switch ($_.Type) {
-        "BepInExPlugin" {
-            Invoke-DownloadAndExtractArchive -Url $DownloadUrl -Destination $BepInExPluginsDirectory -FlatCopy -Include "*.dll"
+    try {
+        $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
+        switch ($mod.Type) {
+            "BepInExPlugin" {
+                Write-Debug -Message "Copy DLL files from `"$FullName`" to `"$BepInExPluginsDirectory`"."
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInExPluginsDirectory
+                foreach ($item in $mod.ExtraIncludes) {
+                    $Path = Join-Path -Path $TempPackage -ChildPath $item
+                    Write-Debug -Message "Copy `"$item`" from `"$FullName`" to `"$BepInExPluginsDirectory`"."
+                    Copy-Item -Path $Path -Destination $BepInExPluginsDirectory -Recurse
+                }
+            }
+            Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
-        Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
     }
+    finally { Remove-Item -Path $TempPackage -Recurse }
 }
 
 Write-Host "Installation of Lethal Company mods completed." -ForegroundColor Cyan
