@@ -99,6 +99,23 @@ function Invoke-PackageDownloader {
         $TemporaryDirectory
     }
 }
+
+function Invoke-StartWaitStopProcess {
+    # Start, wait and stop process
+    [CmdletBinding()]
+    param (
+        [string] $Executable,
+        [string] $ProcessName,
+        [int] $Seconds = 10
+    )
+
+    Write-Debug -Message "Start `"$Executable`" and wait."
+    Start-Process -FilePath $Executable -WindowStyle Hidden
+    Start-Sleep -Seconds $Seconds
+    Write-Debug -Message "Stop `"$ProcessName`" process and wait."
+    Stop-Process -Name $ProcessName -Force
+    Start-Sleep -Seconds 1
+}
 #endregion ----
 
 #region ---- Definition of mods for Lethal Company
@@ -209,12 +226,7 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
-Write-Debug -Message "Start Lethal Company process and wait."
-Start-Process -FilePath $GameExecutable -WindowStyle Hidden
-Start-Sleep -Seconds 10
-Write-Debug -Message "Stop Lethal Company process and wait."
-Stop-Process -Name "Lethal Company" -Force
-Start-Sleep -Seconds 2
+Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
 
 # Check if BepInEx configuration files have been successfully generated
 Write-Host "Check BepInEx installation."
