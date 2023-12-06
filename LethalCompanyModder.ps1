@@ -185,6 +185,12 @@ Write-Host "Clean BepInEx files and directory up."
 ) | ForEach-Object -Process {
     $Path = Join-Path -Path $GameDirectory -ChildPath $_
     if (Test-Path -Path $Path) {
+        if ($_ -eq "BepInEx") {
+            # Backup BepInEx directory
+            $BackupPath = Join-Path -Path $GameDirectory -ChildPath "BepInEx_Backup.zip"
+            Write-Debug -Message "Backup existing BepInEx directory to `"$BackupPath`"."
+            Compress-Archive -Path $Path -DestinationPath $BackupPath -Force
+        }
         Write-Debug -Message "Remove existing BepInEx component `"$_`"."
         Remove-Item -Path $Path -Recurse -Force
     }
