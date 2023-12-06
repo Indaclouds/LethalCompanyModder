@@ -116,6 +116,7 @@ _This is the selection of mods to be installed when no curated or custom preset 
 - [LBtoKG](https://thunderstore.io/c/lethal-company/p/Zduniusz/LBtoKG/) by Zduniusz
 - [AlwaysHearActiveWalkies](https://thunderstore.io/c/lethal-company/p/Suskitech/AlwaysHearActiveWalkies/) by Suskitech
 - [Solos Bodycams](https://thunderstore.io/c/lethal-company/p/CapyCat/Solos_Bodycams/) by CapyCat
+- [More Suits](https://thunderstore.io/c/lethal-company/p/x753/More_Suits/) by x753
 
 ## Check your files
 

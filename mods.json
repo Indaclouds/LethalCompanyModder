@@ -29,7 +29,8 @@
       "Terminal_Clock",
       "LBtoKG",
       "AlwaysHearActiveWalkies",
-      "Solos_Bodycams"
+      "Solos_Bodycams",
+      "More_Suits"
     ]
   },
   "Mods": [
@@ -99,7 +100,7 @@
     {
       "Name": "AlwaysHearActiveWalkies",
       "DisplayName": "AlwaysHearActiveWalkies",
-      "Description": "Allows you to hear active walkies even when you're not holding them",
+      "Description": "Allow you to hear active walkies even when you're not holding them",
       "Provider": "Thunderstore",
       "Namespace": "Suskitech",
       "Type": "BepInExPlugin",
@@ -139,6 +140,16 @@
       "Provider": "Thunderstore",
       "Namespace": "phawitpp",
       "Type": "BepInExPlugin",
+      "ServerHostOnly": false
+    },
+    {
+      "Name": "More_Suits",
+      "DisplayName": "More Suits",
+      "Description": "Add more suits",
+      "Provider": "Thunderstore",
+      "Namespace": "x753",
+      "Type": "BepInExPlugin",
+      "ExtraFiles": "BepInEx\\plugins\\moresuits",
       "ServerHostOnly": false
     }
   ]
