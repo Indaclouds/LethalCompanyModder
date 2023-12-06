@@ -65,7 +65,7 @@ $Mods = $(switch ($PSCmdlet.ParameterSetName) {
         "Curated" {
             Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Indaclouds/LethalCompanyModder/$GitBranch/mods/$List.json" | Select-Object -ExpandProperty Content
         }
-        "Custom" { Get-Content -Path $ModsFile -Raw }
+        "Custom" { Get-Content -Path $File -Raw }
     }) | ConvertFrom-Json
 #endregion ----
 
