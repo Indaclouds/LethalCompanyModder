@@ -246,26 +246,23 @@ $BepInEx.ConfigFile, $BepInEx.LogFile | ForEach-Object -Process {
     else { throw "BepInEx installation failed because `"$_`" not found." }
 }
 
-# Define BepInEx plugins directory
-$BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
-
 # Install Mods from Thunderstore
 $ThunderstoreMods = $Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore"
 foreach ($mod in $ThunderstoreMods) {
     Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
     $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
-    if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
+    if (-not $DownloadUrl) { throw "$FullName mod download URL was not found." }
     try {
         $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
         switch ($mod.Type) {
             "BepInExPlugin" {
-                Write-Debug -Message "Copy DLL files from `"$FullName`" to `"$BepInExPluginsDirectory`"."
-                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInExPluginsDirectory
+                Write-Debug -Message ("BepInExPlugin {0}: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PluginsDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PluginsDirectory
                 foreach ($item in $mod.ExtraIncludes) {
                     $Path = Join-Path -Path $TempPackage -ChildPath $item
-                    Write-Debug -Message "Copy `"$item`" from `"$FullName`" to `"$BepInExPluginsDirectory`"."
-                    Copy-Item -Path $Path -Destination $BepInExPluginsDirectory -Recurse
+                    Write-Debug -Message ("BepInExPlugin {0}: Copy `"{1}`" to `"{2}`"." -f $FullName, $item, $BepInEx.PluginsDirectory)
+                    Copy-Item -Path $Path -Destination $BepInEx.PluginsDirectory -Recurse
                 }
             }
             "BepInExPatcher" {
