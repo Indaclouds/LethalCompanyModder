@@ -186,7 +186,7 @@ $ChildItemParams = @{
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if (-not $GameDirectory) { throw "Lethal Company directory not found." }
+if (-not $GameDirectory) { throw "Lethal Company installation directory not found." }
 Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
 try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
 catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
