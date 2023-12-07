@@ -227,15 +227,23 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 Write-Host "Launch Lethal Company to install BepInEx."
 Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
 
-# Check if BepInEx configuration files have been successfully generated
-Write-Host "Check BepInEx installation."
-@(
-    "config\BepInEx.cfg"
-    "LogOutput.log"
-) | ForEach-Object -Process {
-    $Path = Join-Path -Path $GameDirectory -ChildPath "BepInEx\$_"
-    if (Test-Path -Path $Path) { Write-Debug -Message "BepInEx configuration file `"$_`" found." }
-    else { throw "BepInEx configuration failed because `"$_`" not found." }
+# Define BepInEx item structure
+$BepInExRoot = "$GameDirectory\BepInEx"
+$BepInEx = @{
+    RootDirectory     = $BepInExRoot
+    CoreDirectory     = "$BepInExRoot\core"
+    ConfigDirectory   = "$BepInExRoot\config"
+    ConfigFile        = "$BepInExRoot\config\BepInEx.cfg"
+    PluginsDirectory  = "$BepInExRoot\plugins"
+    PatchersDirectory = "$BepInExRoot\patchers"
+    LogFile           = "$BepInExRoot\LogOutput.log"
+}
+
+# Check if BepInEx files have been successfully generated
+Write-Host "Validate BepInEx installation."
+$BepInEx.ConfigFile, $BepInEx.LogFile | ForEach-Object -Process {
+    if (Test-Path -Path $_) { Write-Debug -Message "BepInEx file `"$_`" found." }
+    else { throw "BepInEx installation failed because `"$_`" not found." }
 }
 
 # Define BepInEx plugins directory
