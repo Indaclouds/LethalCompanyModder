@@ -266,7 +266,10 @@ foreach ($mod in $ThunderstoreMods) {
                 }
             }
             "BepInExPatcher" {
-                Write-Warning -Message "Cannot install `"$FullName`" as BepInExPatcher support is not implemented yet."
+                Write-Debug -Message ("{0} BepInExPatcher: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PatchersDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PatchersDirectory
+                Write-Debug -Message ("{0} BepInExPatcher: Copy CFG files to `"{1}`"." -f $FullName, $BepInEx.ConfigDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.cfg" -Recurse | Copy-Item -Destination $BepInEx.ConfigDirectory
             }
             Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
