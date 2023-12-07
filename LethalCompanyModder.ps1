@@ -192,6 +192,18 @@ try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Compan
 catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
 Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
+# Define BepInEx item structure
+$BepInExRoot = "$GameDirectory\BepInEx"
+$BepInEx = @{
+    RootDirectory     = "$BepInExRoot"
+    CoreDirectory     = "$BepInExRoot\core"
+    ConfigDirectory   = "$BepInExRoot\config"
+    ConfigFile        = "$BepInExRoot\config\BepInEx.cfg"
+    PluginsDirectory  = "$BepInExRoot\plugins"
+    PatchersDirectory = "$BepInExRoot\patchers"
+    LogFile           = "$BepInExRoot\LogOutput.log"
+}
+
 # Remove existing BepInEx components from Lethal Company directory
 Write-Host "Clean BepInEx files and directory up."
 @(
@@ -226,18 +238,6 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
 Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
-
-# Define BepInEx item structure
-$BepInExRoot = "$GameDirectory\BepInEx"
-$BepInEx = @{
-    RootDirectory     = $BepInExRoot
-    CoreDirectory     = "$BepInExRoot\core"
-    ConfigDirectory   = "$BepInExRoot\config"
-    ConfigFile        = "$BepInExRoot\config\BepInEx.cfg"
-    PluginsDirectory  = "$BepInExRoot\plugins"
-    PatchersDirectory = "$BepInExRoot\patchers"
-    LogFile           = "$BepInExRoot\LogOutput.log"
-}
 
 # Check if BepInEx files have been successfully generated
 Write-Host "Validate BepInEx installation."
