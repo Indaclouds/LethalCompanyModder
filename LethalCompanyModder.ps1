@@ -186,12 +186,11 @@ $ChildItemParams = @{
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if ($GameDirectory) {
-    try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop }
-    catch { throw "Lethal Company executable not found." }
-}
-else { throw "Lethal Company installation directory not found." }
-Write-Debug -Message "Lethal Company installation has been found in directory `"$GameDirectory`"."
+if (-not $GameDirectory) { throw "Lethal Company installation directory not found." }
+Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
+try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
+catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
+Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
 # Remove existing BepInEx components from Lethal Company directory
 Write-Host "Clean BepInEx files and directory up."
@@ -228,19 +227,24 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 Write-Host "Launch Lethal Company to install BepInEx."
 Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
 
-# Check if BepInEx configuration files have been successfully generated
-Write-Host "Check BepInEx installation."
-@(
-    "config\BepInEx.cfg"
-    "LogOutput.log"
-) | ForEach-Object -Process {
-    $Path = Join-Path -Path $GameDirectory -ChildPath "BepInEx\$_"
-    if (Test-Path -Path $Path) { Write-Debug -Message "BepInEx configuration file `"$_`" found." }
-    else { throw "BepInEx configuration failed because `"$_`" not found." }
+# Define BepInEx item structure
+$BepInExRoot = "$GameDirectory\BepInEx"
+$BepInEx = @{
+    RootDirectory     = $BepInExRoot
+    CoreDirectory     = "$BepInExRoot\core"
+    ConfigDirectory   = "$BepInExRoot\config"
+    ConfigFile        = "$BepInExRoot\config\BepInEx.cfg"
+    PluginsDirectory  = "$BepInExRoot\plugins"
+    PatchersDirectory = "$BepInExRoot\patchers"
+    LogFile           = "$BepInExRoot\LogOutput.log"
 }
 
-# Define BepInEx plugins directory
-$BepInExPluginsDirectory = Join-Path -Path $GameDirectory -ChildPath "BepInEx\plugins"
+# Check if BepInEx files have been successfully generated
+Write-Host "Validate BepInEx installation."
+$BepInEx.ConfigFile, $BepInEx.LogFile | ForEach-Object -Process {
+    if (Test-Path -Path $_) { Write-Debug -Message "BepInEx file `"$_`" found." }
+    else { throw "BepInEx installation failed because `"$_`" not found." }
+}
 
 # Install Mods from Thunderstore
 $ThunderstoreMods = $Mods | Where-Object -Property "Provider" -EQ -Value "Thunderstore"
@@ -248,21 +252,24 @@ foreach ($mod in $ThunderstoreMods) {
     Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
     $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
-    if (-not $DownloadUrl) { throw "`"$FullName`" mod download URL was not found." }
+    if (-not $DownloadUrl) { throw "$FullName mod download URL was not found." }
     try {
         $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
         switch ($mod.Type) {
             "BepInExPlugin" {
-                Write-Debug -Message "Copy DLL files from `"$FullName`" to `"$BepInExPluginsDirectory`"."
-                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInExPluginsDirectory
+                Write-Debug -Message ("BepInExPlugin {0}: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PluginsDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PluginsDirectory
                 foreach ($item in $mod.ExtraIncludes) {
                     $Path = Join-Path -Path $TempPackage -ChildPath $item
-                    Write-Debug -Message "Copy `"$item`" from `"$FullName`" to `"$BepInExPluginsDirectory`"."
-                    Copy-Item -Path $Path -Destination $BepInExPluginsDirectory -Recurse
+                    Write-Debug -Message ("BepInExPlugin {0}: Copy `"{1}`" to `"{2}`"." -f $FullName, $item, $BepInEx.PluginsDirectory)
+                    Copy-Item -Path $Path -Destination $BepInEx.PluginsDirectory -Recurse
                 }
             }
             "BepInExPatcher" {
-                Write-Warning -Message "Cannot install `"$FullName`" as BepInExPatcher support is not implemented yet."
+                Write-Debug -Message ("{0} BepInExPatcher: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PatchersDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PatchersDirectory
+                Write-Debug -Message ("{0} BepInExPatcher: Copy CFG files to `"{1}`"." -f $FullName, $BepInEx.ConfigDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.cfg" -Recurse | Copy-Item -Destination $BepInEx.ConfigDirectory
             }
             Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
         }
