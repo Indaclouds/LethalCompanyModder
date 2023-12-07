@@ -186,12 +186,11 @@ $ChildItemParams = @{
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if ($GameDirectory) {
-    try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve -ErrorAction Stop }
-    catch { throw "Lethal Company executable not found." }
-}
-else { throw "Lethal Company installation directory not found." }
-Write-Debug -Message "Lethal Company installation has been found in directory `"$GameDirectory`"."
+if (-not $GameDirectory) { throw "Lethal Company directory not found." }
+Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
+try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
+catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
+Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
 # Remove existing BepInEx components from Lethal Company directory
 Write-Host "Clean BepInEx files and directory up."
