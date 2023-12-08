@@ -72,7 +72,7 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 }
 
 # Check if system is running on Windows
-if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
+if ($env:OS -notmatch "Windows") { Write-Error -Message "Cannot run as it supports Windows only." }
 #endregion ----
 
 #region ---- Define helper functions
@@ -105,7 +105,7 @@ function Invoke-PackageDownloader {
         }
         catch {
             Remove-Item -Path $TemporaryDirectory -Recurse
-            throw "An error occured with package downloader: {0}" -f $_.Exception.Message
+            Write-Error -Message "An error occured with package downloader: {0}" -f $_.Exception.Message
         }
         $TemporaryDirectory
     }
@@ -140,7 +140,7 @@ $ModsData = $(switch ($PSCmdlet.ParameterSetName) {
     }) | ConvertFrom-Json
 $SelectedMods = $ModsData.Presets | Select-Object -ExpandProperty $Preset
 if (-not $SelectedMods) {
-    throw "No mod to install. Preset `"$Preset`" is empty or does not exist."
+    Write-Error -Message "No mod to install. Preset `"$Preset`" is empty or does not exist."
 }
 $Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $SelectedMods
 
@@ -198,10 +198,10 @@ $ChildItemParams = @{
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if (-not $GameDirectory) { throw "Lethal Company installation directory not found." }
+if (-not $GameDirectory) { Write-Error -Message "Lethal Company installation directory not found." }
 Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
 try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
-catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
+catch { Write-Error -Message "Lethal Company executable not found in directory `"$GameDirectory`"." }
 Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
 # Define BepInEx structure
@@ -220,7 +220,7 @@ $BepInEx = @{
 if (Test-Path -Path $BepInEx.RootDirectory) {
     if (-not $Upgrade.IsPresent) {
         if (-not $Force.IsPresent) {
-            throw "BepInEx directory already exist. Please, run the script in upgrade mode or force the re-installation."
+            Write-Error -Message "BepInEx directory already exist. Please, run the script in upgrade mode or force the re-installation."
         }
     }
 
@@ -263,7 +263,7 @@ if (Test-Path -Path $BepInEx.RootDirectory) {
 # Install BepInEx from GitHub
 Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
-if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
+if (-not $DownloadUrl) { Write-Error -Message "BepInEx download URL not found." }
 try {
     $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
     Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
@@ -279,7 +279,7 @@ Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Com
 Write-Host "Validate BepInEx installation."
 $BepInEx.ConfigFile, $BepInEx.LogFile | ForEach-Object -Process {
     if (Test-Path -Path $_) { Write-Debug -Message "BepInEx file `"$_`" found." }
-    else { throw "BepInEx installation failed because `"$_`" not found." }
+    else { Write-Error -Message "BepInEx installation failed because `"$_`" not found." }
 }
 
 # Install Mods from Thunderstore
@@ -288,7 +288,7 @@ foreach ($mod in $ThunderstoreMods) {
     Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
     $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
-    if (-not $DownloadUrl) { throw "$FullName mod download URL was not found." }
+    if (-not $DownloadUrl) { Write-Error -Message "$FullName mod download URL was not found." }
     try {
         $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
         switch ($mod.Type) {
