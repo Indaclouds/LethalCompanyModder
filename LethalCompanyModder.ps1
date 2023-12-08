@@ -47,18 +47,20 @@ param (
         ParameterSetName = "Custom",
         HelpMessage = "Path to a JSON file including the preset of mods to install"
     )]
-    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+    [ValidateScript({ if (Test-Path -Path $_ -PathType Leaf) { $true } else { throw "`"$_`" file not found." } })]
     [string] $File,
 
     [Parameter(
         HelpMessage = "Upgrade everything but keep the existing configuration"
     )]
+    [ValidateScript({ if ($Force.IsPresent) { throw "Cannot use Upgrade and Force parameters at the same time." } else { $true } })]
     [Alias("Update")]
     [switch] $Upgrade,
 
     [Parameter(
         HelpMessage = "Proceed to clean installation"
     )]
+    [ValidateScript({ if ($Upgrade.IsPresent) { throw "Cannot use Upgrade and Force parameters at the same time." } else { $true } })]
     [switch] $Force
 )
 
