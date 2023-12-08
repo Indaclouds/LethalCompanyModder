@@ -11,11 +11,12 @@ You don't need to install anything on your Windows system to run this script.
 - [LethalCompanyModder](#lethalcompanymodder)
   - [How to use](#how-to-use)
     - [Basic installation](#basic-installation)
-    - [Custom installation](#custom-installation)
+    - [Advanced installation](#advanced-installation)
       - [Install a curated preset of mods](#install-a-curated-preset-of-mods)
       - [Install a preset of mods from file](#install-a-preset-of-mods-from-file)
       - [Install for game host](#install-for-game-host)
-    - [Update](#update)
+      - [Upgrade](#upgrade)
+      - [Clean installation](#clean-installation)
   - [Curated presets of mods](#curated-presets-of-mods)
     - [`Default` preset](#default-preset)
     - [`Hardcore` preset](#hardcore-preset)
@@ -41,7 +42,7 @@ To run ths script, follow these steps:
 
 It's as simple as that! 😄
 
-### Custom installation
+### Advanced installation
 
 If needed, you can pass some parameters to the script:
 
@@ -73,13 +74,27 @@ Install mods, including those required only by the game host:
 & .\LethalCompanyModder.ps1 -ServerHost
 ```
 
-### Update
+#### Upgrade
 
-If you need to update, re-run the script once again.
+If you need to upgrade your mods, re-run the script with the `Upgrade` parameter.
 
-Mods and dependencies will be re-installed with the latest version.
+```powershell
+& .\LethalCompanyModder.ps1 -Upgrade
+```
 
-`BepInEx` directory is backup-ed in the game directory as `BepInEx_Backup.zip`.
+Mods and dependencies will be re-installed with the latest version but keep the configuration.
+
+_`BepInEx` directory is backup-ed in the game directory as `BepInEx_Backup.zip`._
+
+#### Clean installation
+
+If you would like to re-install everything, run the script with the `Force` parameter.
+
+```powershell
+& .\LethalCompanyModder.ps1 -Force
+```
+
+_`BepInEx` directory is backup-ed in the game directory as `BepInEx_Backup.zip`._
 
 ## Curated presets of mods
 
