@@ -47,8 +47,21 @@ param (
         ParameterSetName = "Custom",
         HelpMessage = "Path to a JSON file including the preset of mods to install"
     )]
-    [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
-    [string] $File
+    [ValidateScript({ if (Test-Path -Path $_ -PathType Leaf) { $true } else { throw "`"$_`" file not found." } })]
+    [string] $File,
+
+    [Parameter(
+        HelpMessage = "Upgrade everything but keep the existing configuration"
+    )]
+    [ValidateScript({ if ($Force.IsPresent) { throw "Cannot use Upgrade and Force parameters at the same time." } else { $true } })]
+    [Alias("Update")]
+    [switch] $Upgrade,
+
+    [Parameter(
+        HelpMessage = "Proceed to clean installation"
+    )]
+    [ValidateScript({ if ($Upgrade.IsPresent) { throw "Cannot use Upgrade and Force parameters at the same time." } else { $true } })]
+    [switch] $Force
 )
 
 #region ---- System and PowerShell configuration and pre-flight check
@@ -61,7 +74,7 @@ if ($PSBoundParameters.Debug -and $PSEdition -eq "Desktop") {
 }
 
 # Check if system is running on Windows
-if ($env:OS -notmatch "Windows") { throw "Cannot run as it supports Windows only." }
+if ($env:OS -notmatch "Windows") { Write-Error -Message "Cannot run as it supports Windows only." }
 #endregion ----
 
 #region ---- Define helper functions
@@ -94,7 +107,7 @@ function Invoke-PackageDownloader {
         }
         catch {
             Remove-Item -Path $TemporaryDirectory -Recurse
-            throw "An error occured with package downloader: {0}" -f $_.Exception.Message
+            Write-Error -Message "An error occured with package downloader: {0}" -f $_.Exception.Message
         }
         $TemporaryDirectory
     }
@@ -129,7 +142,7 @@ $ModsData = $(switch ($PSCmdlet.ParameterSetName) {
     }) | ConvertFrom-Json
 $SelectedMods = $ModsData.Presets | Select-Object -ExpandProperty $Preset
 if (-not $SelectedMods) {
-    throw "No mod to install. Preset `"$Preset`" is empty or does not exist."
+    Write-Error -Message "No mod to install. Preset `"$Preset`" is empty or does not exist."
 }
 $Mods = $ModsData.Mods | Where-Object -Property Name -In -Value $SelectedMods
 
@@ -171,6 +184,7 @@ Mods to be installed:
 Write-Host $Banner -ForegroundColor Green
 
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
+if ($Upgrade.IsPresent) { Write-Host "This runs in upgrade mode." -ForegroundColor Cyan }
 
 # Search for directory where Lethal Company is installed
 Write-Host "Search for Lethal Company installation directory."
@@ -186,36 +200,72 @@ $ChildItemParams = @{
     Filter = "Lethal Company"
 }
 $GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if (-not $GameDirectory) { throw "Lethal Company installation directory not found." }
+if (-not $GameDirectory) { Write-Error -Message "Lethal Company installation directory not found." }
 Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
 try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
-catch { throw "Lethal Company executable not found in directory `"$GameDirectory`"." }
+catch { Write-Error -Message "Lethal Company executable not found in directory `"$GameDirectory`"." }
 Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
-# Remove existing BepInEx components from Lethal Company directory
-Write-Host "Clean BepInEx files and directory up."
-@(
-    "BepInEx"
-    "winhttp.dll"
-    "doorstop_config.ini"
-) | ForEach-Object -Process {
-    $Path = Join-Path -Path $GameDirectory -ChildPath $_
-    if (Test-Path -Path $Path) {
-        if ($_ -eq "BepInEx") {
-            # Backup BepInEx directory
-            $BackupPath = Join-Path -Path $GameDirectory -ChildPath "BepInEx_Backup.zip"
-            Write-Debug -Message "Backup existing BepInEx directory to `"$BackupPath`"."
-            Compress-Archive -Path $Path -DestinationPath $BackupPath -Force
+# Define BepInEx structure
+$BepInEx = @{
+    RootDirectory     = "$GameDirectory\BepInEx"
+    CoreDirectory     = "$GameDirectory\BepInEx\core"
+    ConfigDirectory   = "$GameDirectory\BepInEx\config"
+    ConfigFile        = "$GameDirectory\BepInEx\config\BepInEx.cfg"
+    PluginsDirectory  = "$GameDirectory\BepInEx\plugins"
+    PatchersDirectory = "$GameDirectory\BepInEx\patchers"
+    LogFile           = "$GameDirectory\BepInEx\LogOutput.log"
+    WinhttpDll        = "$GameDirectory\winhttp.dll"
+    DoorstopConfigIni = "$GameDirectory\doorstop_config.ini"
+}
+
+if (Test-Path -Path $BepInEx.RootDirectory) {
+    if (-not $Upgrade.IsPresent) {
+        if (-not $Force.IsPresent) {
+            Write-Error -Message "BepInEx directory already exist. Please, run the script in upgrade mode or force the re-installation."
         }
-        Write-Debug -Message "Remove existing BepInEx component `"$_`"."
-        Remove-Item -Path $Path -Recurse -Force
+    }
+
+    # Backup BepInEx directory
+    Write-Host "Backup BepInEx directory."
+    $BackupParams = @{
+        Path            = $BepInEx.RootDirectory
+        DestinationPath = "{0}_Backup.zip" -f $BepInEx.RootDirectory
+    }
+    Write-Debug -Message ("Backup existing BepInEx directory to `"{0}`"." -f $BackupParams.DestinationPath)
+    Compress-Archive @BackupParams -Force
+
+    # Remove existing BepInEx components from Lethal Company directory
+    Write-Host "Clean BepInEx files and directory up."
+    $ItemsToRemove = if ($Upgrade.IsPresent) {
+        @(
+            $BepInEx.CoreDirectory
+            $BepInEx.PluginsDirectory
+            $BepInEx.PatchersDirectory
+            $BepInEx.LogFile
+            $BepInEx.WinhttpDll
+            $BepInEx.DoorstopConfigIni
+        )
+    }
+    else {
+        @(
+            $BepInEx.RootDirectory
+            $BepInEx.WinhttpDll
+            $BepInEx.DoorstopConfigIni
+        )
+    }
+    $ItemsToRemove | ForEach-Object -Process {
+        if (Test-Path -Path $_) {
+            Write-Debug -Message "Remove existing BepInEx component `"$_`"."
+            Remove-Item -Path $_ -Recurse -Force
+        }
     }
 }
 
 # Install BepInEx from GitHub
 Write-Host "Install BepInEx plugin framework."
 $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
-if (-not $DownloadUrl) { throw "BepInEx download URL not found." }
+if (-not $DownloadUrl) { Write-Error -Message "BepInEx download URL not found." }
 try {
     $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
     Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
@@ -227,23 +277,11 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 Write-Host "Launch Lethal Company to install BepInEx."
 Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
 
-# Define BepInEx item structure
-$BepInExRoot = "$GameDirectory\BepInEx"
-$BepInEx = @{
-    RootDirectory     = $BepInExRoot
-    CoreDirectory     = "$BepInExRoot\core"
-    ConfigDirectory   = "$BepInExRoot\config"
-    ConfigFile        = "$BepInExRoot\config\BepInEx.cfg"
-    PluginsDirectory  = "$BepInExRoot\plugins"
-    PatchersDirectory = "$BepInExRoot\patchers"
-    LogFile           = "$BepInExRoot\LogOutput.log"
-}
-
 # Check if BepInEx files have been successfully generated
 Write-Host "Validate BepInEx installation."
 $BepInEx.ConfigFile, $BepInEx.LogFile | ForEach-Object -Process {
     if (Test-Path -Path $_) { Write-Debug -Message "BepInEx file `"$_`" found." }
-    else { throw "BepInEx installation failed because `"$_`" not found." }
+    else { Write-Error -Message "BepInEx installation failed because `"$_`" not found." }
 }
 
 # Install Mods from Thunderstore
@@ -252,26 +290,31 @@ foreach ($mod in $ThunderstoreMods) {
     Write-Host ("Install {0} mod by {1}." -f $mod.DisplayName, $mod.Namespace)
     $FullName = "{0}/{1}" -f $mod.Namespace, $mod.Name
     $DownloadUrl = (Invoke-RestMethod -Uri "https://thunderstore.io/api/experimental/package/$FullName/")."latest"."download_url"
-    if (-not $DownloadUrl) { throw "$FullName mod download URL was not found." }
+    if (-not $DownloadUrl) { Write-Error -Message "$FullName mod download URL was not found." }
     try {
         $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
         switch ($mod.Type) {
             "BepInExPlugin" {
-                Write-Debug -Message ("BepInExPlugin {0}: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PluginsDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PluginsDirectory
+                Write-Debug -Message ("{0} {1}: Copy DLL files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.PluginsDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PluginsDirectory
                 foreach ($item in $mod.ExtraIncludes) {
                     $Path = Join-Path -Path $TempPackage -ChildPath $item
-                    Write-Debug -Message ("BepInExPlugin {0}: Copy `"{1}`" to `"{2}`"." -f $FullName, $item, $BepInEx.PluginsDirectory)
-                    Copy-Item -Path $Path -Destination $BepInEx.PluginsDirectory -Recurse
+                    Write-Debug -Message ("{0} {1}: Copy `"{2}`" to `"{3}`"." -f $mod.Type, $FullName, $item, $BepInEx.PluginsDirectory)
+                    Move-Item -Path $Path -Destination $BepInEx.PluginsDirectory
                 }
             }
             "BepInExPatcher" {
-                Write-Debug -Message ("{0} BepInExPatcher: Copy DLL files to `"{1}`"." -f $FullName, $BepInEx.PatchersDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Copy-Item -Destination $BepInEx.PatchersDirectory
-                Write-Debug -Message ("{0} BepInExPatcher: Copy CFG files to `"{1}`"." -f $FullName, $BepInEx.ConfigDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -Include "*.cfg" -Recurse | Copy-Item -Destination $BepInEx.ConfigDirectory
+                Write-Debug -Message ("{0} {1}: Copy DLL files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.PatchersDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PatchersDirectory
+                Write-Debug -Message ("{0} {1}: Copy CFG files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.ConfigDirectory)
+                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.cfg" -Recurse | ForEach-Object -Process {
+                    $Path = Join-Path -Path $BepInEx.ConfigDirectory -ChildPath $_.Name
+                    if (-not (Test-Path -Path $Path)) {
+                        Move-Item -Path $_.FullName -Destination $BepInEx.ConfigDirectory
+                    }
+                }
             }
-            Default { Write-Error -Message "Unknown mod type for `"$FullName`"." }
+            Default { Write-Warning -Message ("Unknown `"{0}`" mod type for {1}. Skip." -f $mod.Type, $FullName) }
         }
     }
     finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
