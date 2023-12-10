@@ -296,7 +296,7 @@ foreach ($mod in $ThunderstoreMods) {
         switch ($mod.Type) {
             "BepInExPlugin" {
                 Write-Debug -Message ("{0} {1}: Copy DLL files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.PluginsDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PluginsDirectory
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PluginsDirectory
                 foreach ($item in $mod.ExtraIncludes) {
                     $Path = Join-Path -Path $TempPackage -ChildPath $item
                     Write-Debug -Message ("{0} {1}: Copy `"{2}`" to `"{3}`"." -f $mod.Type, $FullName, $item, $BepInEx.PluginsDirectory)
@@ -305,9 +305,9 @@ foreach ($mod in $ThunderstoreMods) {
             }
             "BepInExPatcher" {
                 Write-Debug -Message ("{0} {1}: Copy DLL files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.PatchersDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PatchersDirectory
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.dll" -Recurse | Move-Item -Destination $BepInEx.PatchersDirectory
                 Write-Debug -Message ("{0} {1}: Copy CFG files to `"{2}`"." -f $mod.Type, $FullName, $BepInEx.ConfigDirectory)
-                Get-ChildItem -Path "$TempPackage\*" -File -Include "*.cfg" -Recurse | ForEach-Object -Process {
+                Get-ChildItem -Path "$TempPackage\*" -Include "*.cfg" -Recurse | ForEach-Object -Process {
                     $Path = Join-Path -Path $BepInEx.ConfigDirectory -ChildPath $_.Name
                     if (-not (Test-Path -Path $Path)) {
                         Move-Item -Path $_.FullName -Destination $BepInEx.ConfigDirectory
