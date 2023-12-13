@@ -52,7 +52,7 @@ If needed, you can pass some parameters to the script:
 
 #### Install a curated preset of mods
 
-Install mods from a preser maintained by us on GitHub:
+Install mods from a preset maintained by us on GitHub:
 
 ```powershell
 & .\LethalCompanyModder.ps1 -Preset "Hardcore"
