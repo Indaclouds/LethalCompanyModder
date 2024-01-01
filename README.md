@@ -17,6 +17,7 @@ You don't need to install anything on your Windows system to run this script.
       - [Install for game host](#install-for-game-host)
       - [Upgrade](#upgrade)
       - [Clean installation](#clean-installation)
+      - [Set game directory](#set-game-directory)
   - [Curated presets of mods](#curated-presets-of-mods)
     - [`Default` preset](#default-preset)
     - [`Hardcore` preset](#hardcore-preset)
@@ -95,6 +96,16 @@ If you would like to re-install everything, run the script with the `Force` para
 ```
 
 _`BepInEx` directory is backup-ed in the game directory as `BepInEx_Backup.zip`._
+
+#### Set game directory
+
+By default, the script automatically search for the `Lethal Company` directory on your system.
+
+However, you can define the path to the game directory with the `GameDirectory` parameter.
+
+```powershell
+& .\LethalCompanyModder.ps1 -GameDirectory "C:\Path\to\Lethal Company"
+```
 
 ## Curated presets of mods
 
