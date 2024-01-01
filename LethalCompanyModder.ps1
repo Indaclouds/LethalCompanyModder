@@ -27,6 +27,12 @@
 [CmdletBinding(DefaultParameterSetName = "Curated")]
 param (
     [Parameter(
+        HelpMessage = "Path to the game directory"
+    )]
+    [ValidateScript({ if (Test-Path -Path $_ -PathType Container) { $true } else { throw "`"$_`" directory not found." } })]
+    [string] $GameDirectory,
+
+    [Parameter(
         HelpMessage = "Specify this parameter if you intend to host the game (server)"
     )]
     [Alias("Server")]
@@ -186,37 +192,43 @@ Write-Host $Banner -ForegroundColor Green
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 if ($Upgrade.IsPresent) { Write-Host "This runs in upgrade mode." -ForegroundColor Cyan }
 
-# Search for directory where Lethal Company is installed
-Write-Host "Search for Lethal Company installation directory."
-$DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property "Name" -NE -Value "Temp" | Select-Object -ExpandProperty Root
-$PredictPaths = @(
-    "Program Files (x86)\Steam\steamapps\common"  # Default Steam installation path for games
-    "Program Files\Steam\steamapps\common"
-    "SteamLibrary\steamapps\common"
-    "Steam\SteamLibrary\steamapps\common"
-) | ForEach-Object -Process { foreach ($p in $DriveRootPaths) { Join-Path -Path $p -ChildPath $_ } }
-$ChildItemParams = @{
-    Path   = $PredictPaths + $DriveRootPaths  # Respect order to check every path prediction first
-    Filter = "Lethal Company"
+if ($PSBoundParameters.ContainsKey("GameDirectory")) {
+    # Set Lethal Company directory from GameDirectory parameter
+    $GameRootDirectory = $GameDirectory
 }
-$GameDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-if (-not $GameDirectory) { Write-Error -Message "Lethal Company installation directory not found." }
-Write-Debug -Message "Lethal Company directory found `"$GameDirectory`"."
-try { $GameExecutable = Join-Path -Path $GameDirectory -ChildPath "Lethal Company.exe" -Resolve }
-catch { Write-Error -Message "Lethal Company executable not found in directory `"$GameDirectory`"." }
+else {
+    # Search for directory where Lethal Company is installed
+    Write-Host "Search for Lethal Company installation directory."
+    $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property "Name" -NE -Value "Temp" | Select-Object -ExpandProperty Root
+    $PredictPaths = @(
+        "Program Files (x86)\Steam\steamapps\common"  # Default Steam installation path for games
+        "Program Files\Steam\steamapps\common"
+        "SteamLibrary\steamapps\common"
+        "Steam\SteamLibrary\steamapps\common"
+    ) | ForEach-Object -Process { foreach ($p in $DriveRootPaths) { Join-Path -Path $p -ChildPath $_ } }
+    $ChildItemParams = @{
+        Path   = $PredictPaths + $DriveRootPaths  # Respect order to check every path prediction first
+        Filter = "Lethal Company"
+    }
+    $GameRootDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
+    if (-not $GameRootDirectory) { Write-Error -Message "Lethal Company installation directory not found." }
+}
+Write-Debug -Message "Lethal Company directory is `"$GameRootDirectory`"."
+try { $GameExecutable = Join-Path -Path $GameRootDirectory -ChildPath "Lethal Company.exe" -Resolve }
+catch { Write-Error -Message "Lethal Company executable not found in directory `"$GameRootDirectory`"." }
 Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
 # Define BepInEx structure
 $BepInEx = @{
-    RootDirectory     = "$GameDirectory\BepInEx"
-    CoreDirectory     = "$GameDirectory\BepInEx\core"
-    ConfigDirectory   = "$GameDirectory\BepInEx\config"
-    ConfigFile        = "$GameDirectory\BepInEx\config\BepInEx.cfg"
-    PluginsDirectory  = "$GameDirectory\BepInEx\plugins"
-    PatchersDirectory = "$GameDirectory\BepInEx\patchers"
-    LogFile           = "$GameDirectory\BepInEx\LogOutput.log"
-    WinhttpDll        = "$GameDirectory\winhttp.dll"
-    DoorstopConfigIni = "$GameDirectory\doorstop_config.ini"
+    RootDirectory     = "$GameRootDirectory\BepInEx"
+    CoreDirectory     = "$GameRootDirectory\BepInEx\core"
+    ConfigDirectory   = "$GameRootDirectory\BepInEx\config"
+    ConfigFile        = "$GameRootDirectory\BepInEx\config\BepInEx.cfg"
+    PluginsDirectory  = "$GameRootDirectory\BepInEx\plugins"
+    PatchersDirectory = "$GameRootDirectory\BepInEx\patchers"
+    LogFile           = "$GameRootDirectory\BepInEx\LogOutput.log"
+    WinhttpDll        = "$GameRootDirectory\winhttp.dll"
+    DoorstopConfigIni = "$GameRootDirectory\doorstop_config.ini"
 }
 
 if (Test-Path -Path $BepInEx.RootDirectory) {
@@ -268,8 +280,8 @@ $DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/Bep
 if (-not $DownloadUrl) { Write-Error -Message "BepInEx download URL not found." }
 try {
     $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
-    Write-Debug -Message "Copy BepInEx package to `"$GameDirectory`"."
-    Copy-Item -Path "$TempPackage\*" -Destination $GameDirectory -Exclude "changelog.txt" -Recurse -Force
+    Write-Debug -Message "Copy BepInEx package to `"$GameRootDirectory`"."
+    Copy-Item -Path "$TempPackage\*" -Destination $GameRootDirectory -Exclude "changelog.txt" -Recurse -Force
 }
 finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 
