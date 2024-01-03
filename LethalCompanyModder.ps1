@@ -192,31 +192,40 @@ Write-Host $Banner -ForegroundColor Green
 Write-Host "Installation of Lethal Company mods started." -ForegroundColor Cyan
 if ($Upgrade.IsPresent) { Write-Host "This runs in upgrade mode." -ForegroundColor Cyan }
 
+$GameExecutableName = "Lethal Company.exe"
+
 if ($PSBoundParameters.ContainsKey("GameDirectory")) {
     # Set Lethal Company directory from GameDirectory parameter
     $GameRootDirectory = $GameDirectory
+    Write-Debug -Message "Lethal Company directory is `"$GameRootDirectory`"."
 }
 else {
     # Search for directory where Lethal Company is installed
     Write-Host "Search for Lethal Company installation directory."
     $DriveRootPaths = Get-PSDrive -PSProvider FileSystem | Where-Object -Property "Name" -NE -Value "Temp" | Select-Object -ExpandProperty Root
-    $PredictPaths = @(
+    $PredictedPaths = @(
         "Program Files (x86)\Steam\steamapps\common"  # Default Steam installation path for games
         "Program Files\Steam\steamapps\common"
         "SteamLibrary\steamapps\common"
         "Steam\SteamLibrary\steamapps\common"
     ) | ForEach-Object -Process { foreach ($p in $DriveRootPaths) { Join-Path -Path $p -ChildPath $_ } }
     $ChildItemParams = @{
-        Path   = $PredictPaths + $DriveRootPaths  # Respect order to check every path prediction first
-        Filter = "Lethal Company"
+        Path   = $PredictedPaths + $DriveRootPaths  # Respect order to check every path prediction first
+        Filter = "Lethal Company"  # Default name for game directory
     }
-    $GameRootDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName -First 1
-    if (-not $GameRootDirectory) { Write-Error -Message "Lethal Company installation directory not found." }
+    $GameRootDirectory = Get-ChildItem @ChildItemParams -Directory -Recurse -ErrorAction SilentlyContinue | Where-Object -FilterScript {
+        if (Test-Path -Path (Join-Path -Path $_.FullName -ChildPath $GameExecutableName) -PathType Leaf) { $true }
+        else {
+            Write-Debug -Message ("Skip directory `"{0}`" because executable file `"{1}`" not found." -f $_.FullName, $GameExecutableName)
+        }
+    } | Select-Object -ExpandProperty FullName -First 1
+    if ($GameRootDirectory) {
+        Write-Debug -Message "Lethal Company directory found `"$GameRootDirectory`"."
+    }
+    else {
+        Write-Error -Message "Lethal Company directory not found."
+    }
 }
-Write-Debug -Message "Lethal Company directory is `"$GameRootDirectory`"."
-try { $GameExecutable = Join-Path -Path $GameRootDirectory -ChildPath "Lethal Company.exe" -Resolve }
-catch { Write-Error -Message "Lethal Company executable not found in directory `"$GameRootDirectory`"." }
-Write-Debug -Message "Lethal Company executable found `"$GameExecutable`"."
 
 # Define BepInEx structure
 $BepInEx = @{
@@ -287,6 +296,7 @@ finally { if ($TempPackage) { Remove-Item -Path $TempPackage -Recurse } }
 
 # Run Lethal Company executable to generate BepInEx configuration files
 Write-Host "Launch Lethal Company to install BepInEx."
+$GameExecutable = Join-Path -Path $GameRootDirectory -ChildPath $GameExecutableName
 Invoke-StartWaitStopProcess -Executable $GameExecutable -ProcessName "Lethal Company"
 
 # Check if BepInEx files have been successfully generated
