@@ -1,5 +1,7 @@
 # LethalCompanyModder
 
+[![tested on](https://img.shields.io/badge/tested_on-version_50-informational?style=for-the-badge)](https://)
+
 This PowerShell script installs a selection of mods for LethalCompany.
 
 It also includes the installation of BepInEx, a game patcher / plugin framework for Unity.
