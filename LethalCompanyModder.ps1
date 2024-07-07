@@ -285,7 +285,7 @@ if (Test-Path -Path $BepInEx.RootDirectory) {
 
 # Install BepInEx from GitHub
 Write-Host "Install BepInEx plugin framework."
-$DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_x64_.*.zip"
+$DownloadUrl = (Invoke-RestMethod -Uri "https://api.github.com/repos/BepInEx/BepInEx/releases/latest")."assets"."browser_download_url" | Select-String -Pattern ".*\/BepInEx_win_x64_.*.zip"
 if (-not $DownloadUrl) { Write-Error -Message "BepInEx download URL not found." }
 try {
     $TempPackage = Invoke-PackageDownloader -Url $DownloadUrl
