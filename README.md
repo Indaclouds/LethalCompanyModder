@@ -1,6 +1,9 @@
 # LethalCompanyModder
 
-[![tested on](https://img.shields.io/badge/tested_on-version_50-informational?style=for-the-badge)](https://)
+![tested on game](https://img.shields.io/badge/tested_on_game-version_55-informational?style=for-the-badge)
+
+![PowerShell Core test](https://img.shields.io/badge/PowerShell_Core_7.4.3-passing-success)
+![PowerShell Desktop test](https://img.shields.io/badge/PowerShell_Desktop-passing-success)
 
 This PowerShell script installs a selection of mods for LethalCompany.
 
